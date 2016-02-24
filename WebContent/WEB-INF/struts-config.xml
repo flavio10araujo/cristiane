@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts-config PUBLIC 
+"-//Apache Software Foundation//DTD Struts Configuration 1.3//EN" 
+"http://jakarta.apache.org/struts/dtds/struts-config_1_3.dtd">
+
+<struts-config>
+	<form-beans>
+		<form-bean name="rdbToOntoForm" type="br.ufpr.form.RdbToOntoForm" />
+	</form-beans>
+
+	<action-mappings>
+		<action path="/Overview" type="br.ufpr.action.GoOverviewAction">
+			<forward name="success" path="tiles.overview" />
+		</action>
+		
+		<action path="/RdbToOnto" type="br.ufpr.action.GoRdbToOntoAction" name="rdbToOntoForm">
+			<forward name="success" path="tiles.rdbToOnto" />
+		</action>
+		
+		<action path="/ProcessRdbToOnto" type="br.ufpr.action.ProcessRdbToOntoAction" name="rdbToOntoForm">
+			<forward name="success" path="tiles.rdbToOnto" />
+		</action>
+	</action-mappings>
+	
+	<controller processorClass="org.apache.struts.tiles.TilesRequestProcessor"/>
+	
+	<message-resources parameter="propertiesFiles.MessagesBundle" />
+	
+	<plug-in className="org.apache.struts.tiles.TilesPlugin">
+		<set-property property="definitions-config" value="/WEB-INF/tiles-defs.xml" />
+	</plug-in>
+	
+</struts-config>
