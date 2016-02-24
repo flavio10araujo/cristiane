@@ -22,5 +22,4 @@ public class CheckSubject implements Serializable {
 
 	@Column(name = "c007_description", nullable = false)
 	private String description;
-
 }
