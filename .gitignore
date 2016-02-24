@@ -22,3 +22,8 @@ ehthumbs.db
 Thumbs.db
 /.classpath
 /.project
+
+
+# folders #
+/build/
+/.settings/
