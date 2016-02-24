@@ -59,5 +59,4 @@ public class CheckValue implements Serializable {
 	public void setCheckSubject(CheckSubject checkSubject) {
 		this.checkSubject = checkSubject;
 	}
-
 }
