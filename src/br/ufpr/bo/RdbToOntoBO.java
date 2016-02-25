@@ -77,7 +77,7 @@ public class RdbToOntoBO {
 		while (scanner.hasNextLine()) {
 			String line = scanner.nextLine();
 
-			String[] fields = line.split(";");
+			String[] fields = line.split(";", -1);
 
 			// Inserir as tabelas que não são associativas.
 			if (fields[0].equals("T") && fields[6].equals("0")) {
@@ -109,7 +109,7 @@ public class RdbToOntoBO {
 
 		while (scanner.hasNextLine()) {
 			String line = scanner.nextLine();
-			String[] fields = line.split(";");
+			String[] fields = line.split(";", -1);
 
 			// Inserir as colunas.
 			// Se tem indAssociativeKey = 0 e IndColumnCheck = 0.
@@ -125,7 +125,7 @@ public class RdbToOntoBO {
 
 		while (scanner.hasNextLine()) {
 			String line = scanner.nextLine();
-			String[] fields = line.split(";");
+			String[] fields = line.split(";", -1);
 
 			// Inserir as colunas.
 			// Se tem indAssociativeKey = 1 e IndColumnCheck = 0.
@@ -141,7 +141,7 @@ public class RdbToOntoBO {
 
 		while (scanner.hasNextLine()) {
 			String line = scanner.nextLine();
-			String[] fields = line.split(";");
+			String[] fields = line.split(";", -1);
 
 			// Inserir as colunas.
 			// Se tem IndColumnCheck = 1.
@@ -234,7 +234,7 @@ public class RdbToOntoBO {
 				checkSubjectDao.saveOrUpdate(checkSubject);
 			}
 
-			String[] checkValues = fields[19].split(",");
+			String[] checkValues = fields[19].split(",", -1);
 
 			for (int j = 0; j < checkValues.length; j++) {
 				CheckValue checkValue = new CheckValue();

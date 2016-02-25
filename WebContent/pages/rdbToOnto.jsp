@@ -1,5 +1,6 @@
 <%@ taglib uri="http://struts.apache.org/tags-bean" prefix="bean"%>
 <%@ taglib uri="http://struts.apache.org/tags-html" prefix="html"%>
+<%@ taglib uri="http://struts.apache.org/tags-logic" prefix="logic"%>
 
 <script type="text/javascript">
 	function processRdbToOnto(){
@@ -21,6 +22,14 @@
 			<div class="alert alert-danger" style="display: none;">
 			  <strong><bean:message key="label.alert" /></strong> <bean:message key="label.mandatory.fields" />
 			</div>
+			
+			<logic:messagesPresent message="message">
+            	<html:messages id="message">
+					<div class="alert alert-info">
+						<bean:write name="message" />
+					</div>
+              	</html:messages>
+ 			</logic:messagesPresent>
 			
 			<div class="form-group">
 				<label for="databaseName"><bean:message key="label.database.name" />:</label>
