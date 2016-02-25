@@ -52,5 +52,4 @@ public class DatabaseDomain implements Serializable {
 	public void setDatabase(Database database) {
 		this.database = database;
 	}
-
 }

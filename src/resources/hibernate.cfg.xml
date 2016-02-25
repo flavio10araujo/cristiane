@@ -22,6 +22,8 @@
 		<mapping class="br.ufpr.bean.CheckValue" />
 		<mapping class="br.ufpr.bean.CheckSubject" />
 		<mapping class="br.ufpr.bean.ColumnCheckValue" />
+		<mapping class="br.ufpr.bean.DatabaseDomain" />
+		<mapping class="br.ufpr.bean.TableDatabaseDomain" />
 		<!-- Mapping -->
 	</session-factory>
 </hibernate-configuration>

@@ -9,15 +9,19 @@ import br.ufpr.bean.CheckValue;
 import br.ufpr.bean.Column;
 import br.ufpr.bean.ColumnCheckValue;
 import br.ufpr.bean.Database;
+import br.ufpr.bean.DatabaseDomain;
 import br.ufpr.bean.Datatype;
 import br.ufpr.bean.Table;
+import br.ufpr.bean.TableDatabaseDomain;
 import br.ufpr.dao.CheckSubjectDao;
 import br.ufpr.dao.CheckValueDao;
 import br.ufpr.dao.ColumnCheckValueDao;
 import br.ufpr.dao.ColumnDao;
 import br.ufpr.dao.DatabaseDao;
+import br.ufpr.dao.DatabaseDomainDao;
 import br.ufpr.dao.DatatypeDao;
 import br.ufpr.dao.TableDao;
+import br.ufpr.dao.TableDatabaseDomainDao;
 import br.ufpr.form.RdbToOntoForm;
 
 public class RdbToOntoBO {
@@ -29,6 +33,8 @@ public class RdbToOntoBO {
 	CheckSubjectDao checkSubjectDao = new CheckSubjectDao();
 	CheckValueDao checkValueDao = new CheckValueDao();
 	ColumnCheckValueDao columnCheckValueDao = new ColumnCheckValueDao();
+	DatabaseDomainDao databaseDomainDao = new DatabaseDomainDao();
+	TableDatabaseDomainDao tableDatabaseDomainDao = new TableDatabaseDomainDao();
 
 	/**
 	 * 
@@ -91,6 +97,23 @@ public class RdbToOntoBO {
 				table.setAssociative("1".equals(fields[6]) ? true : false);
 
 				tableDao.saveOrUpdate(table);
+				
+				DatabaseDomain databaseDomain = databaseDomainDao.getByDescription(fields[5]);
+
+				// Se não encontrou o databaseDomain (T008) no banco, deve cadastrá-lo.
+				if (databaseDomain == null) {
+					databaseDomain = new DatabaseDomain();
+					databaseDomain.setDatabase(database);
+					databaseDomain.setDescription(fields[5].toLowerCase());
+					databaseDomainDao.saveOrUpdate(databaseDomain);
+				}
+				
+				TableDatabaseDomain tableDatabaseDomain = new TableDatabaseDomain();
+				tableDatabaseDomain.setTable(table);
+				tableDatabaseDomain.setDatabaseDomain(databaseDomain);
+				
+				// Cadastrando o relacionamento na T010.
+				tableDatabaseDomainDao.saveOrUpdate(tableDatabaseDomain);
 			}
 		}
 

@@ -25,7 +25,7 @@
 			
 			<logic:messagesPresent message="message">
             	<html:messages id="message">
-					<div class="alert alert-info">
+					<div class="alert alert-success">
 						<bean:write name="message" />
 					</div>
               	</html:messages>
