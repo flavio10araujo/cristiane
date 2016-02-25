@@ -19,6 +19,9 @@
 		<mapping class="br.ufpr.bean.Datatype" />
 		<mapping class="br.ufpr.bean.Table" />
 		<mapping class="br.ufpr.bean.Column" />
+		<mapping class="br.ufpr.bean.CheckValue" />
+		<mapping class="br.ufpr.bean.CheckSubject" />
+		<mapping class="br.ufpr.bean.ColumnCheckValue" />
 		<!-- Mapping -->
 	</session-factory>
 </hibernate-configuration>

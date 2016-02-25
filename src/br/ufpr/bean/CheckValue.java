@@ -7,6 +7,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -26,6 +28,8 @@ public class CheckValue implements Serializable {
 	@Column(name = "c006_abreviation", nullable = true)
 	private String abreviation;
 
+	@ManyToOne
+	@JoinColumn(name = "c007_check_subject_id")
 	private CheckSubject checkSubject;
 
 	public Long getId() {

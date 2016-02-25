@@ -14,7 +14,7 @@ public class ProcessRdbToOntoAction extends BaseAction {
 
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		RdbToOntoForm rdbToOntoForm = (RdbToOntoForm) form;
-		new RdbToOntoBO().createDatabase(rdbToOntoForm);
+		new RdbToOntoBO().importFile(rdbToOntoForm);
 		return null;
 	}
 }
