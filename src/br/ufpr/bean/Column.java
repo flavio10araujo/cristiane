@@ -45,7 +45,7 @@ public class Column implements Serializable {
 
 	@ManyToOne
 	@JoinColumn(name = "c005_datatype_id")
-	private Datatype datatype;
+	private DatatypeDb datatypeDb;
 	
 	@javax.persistence.Column(name = "c003_ind_description", nullable = false)
 	private boolean indDescription;
@@ -134,12 +134,12 @@ public class Column implements Serializable {
 		this.fkTable = fkTable;
 	}
 
-	public Datatype getDatatype() {
-		return datatype;
+	public DatatypeDb getDatatypeDb() {
+		return datatypeDb;
 	}
 
-	public void setDatatype(Datatype datatype) {
-		this.datatype = datatype;
+	public void setDatatypeDb(DatatypeDb datatypeDb) {
+		this.datatypeDb = datatypeDb;
 	}
 
 	public boolean isIndDescription() {

@@ -10,7 +10,7 @@ import br.ufpr.bean.Column;
 import br.ufpr.bean.ColumnCheckValue;
 import br.ufpr.bean.Database;
 import br.ufpr.bean.DatabaseDomain;
-import br.ufpr.bean.Datatype;
+import br.ufpr.bean.DatatypeDb;
 import br.ufpr.bean.Table;
 import br.ufpr.bean.TableDatabaseDomain;
 import br.ufpr.dao.CheckSubjectDao;
@@ -201,18 +201,18 @@ public class RdbToOntoBO {
 
 		// Se informou o datatype.
 		if (!"".equals(fields[8])) {
-			Datatype datatype = datatypeDao.getByDescription(fields[8]);
+			DatatypeDb datatypeDb = datatypeDao.getByDescription(fields[8]);
 
 			// Se encontrou o datatype no banco.
-			if (datatype != null) {
-				column.setDatatype(datatype);
+			if (datatypeDb != null) {
+				column.setDatatypeDb(datatypeDb);
 			}
 			else {
 				// Deve cadastrar o datatype.
-				datatype = new Datatype();
-				datatype.setDescription(fields[8].toLowerCase());
-				datatypeDao.saveOrUpdate(datatype);
-				column.setDatatype(datatype);
+				datatypeDb = new DatatypeDb();
+				datatypeDb.setDescription(fields[8].toLowerCase());
+				datatypeDao.saveOrUpdate(datatypeDb);
+				column.setDatatypeDb(datatypeDb);
 			}
 		}
 
@@ -247,22 +247,26 @@ public class RdbToOntoBO {
 		columnDao.saveOrUpdate(column);
 
 		// Se informou o checkSubject.
-		if (!"".equals(fields[20])) {
-			CheckSubject checkSubject = checkSubjectDao.getByDescription(fields[20]);
+		if (!"".equals(fields[21])) {
+			CheckSubject checkSubject = checkSubjectDao.getByDescription(fields[21]);
 
 			// Se não encontrou o checkSubject no banco, deve cadastrá-lo. 
 			if (checkSubject == null) {
 				checkSubject = new CheckSubject();
-				checkSubject.setDescription(fields[20].toLowerCase());
+				checkSubject.setDescription(fields[21].toLowerCase());
+				// Inserindo na T007.
 				checkSubjectDao.saveOrUpdate(checkSubject);
 			}
 
 			String[] checkValues = fields[19].split(",", -1);
+			String[] checkAbreviations = fields[20].split(",", -1);
 
 			for (int j = 0; j < checkValues.length; j++) {
 				CheckValue checkValue = new CheckValue();
 				checkValue.setDescription(checkValues[j]);
+				checkValue.setAbreviation(checkAbreviations[j]);
 				checkValue.setCheckSubject(checkSubject);
+				// Inserindo na T006.
 				checkValueDao.saveOrUpdate(checkValue);
 
 				// Inserindo na T009.

@@ -10,8 +10,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "t005_datatype")
-public class Datatype implements Serializable {
+@Table(name = "t005_datatype_db")
+public class DatatypeDb implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
