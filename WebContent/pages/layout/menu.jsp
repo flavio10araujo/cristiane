@@ -36,6 +36,7 @@ $(document).ready(function(){
 					<ul class="dropdown-menu">
 						<li><a href="#"><bean:message key="label.upper.level.ontology" /></a></li>
 						<li><a href="#"><bean:message key="label.project.database" /></a></li>
+						<li><a href="#" onclick="javascript: goToPage('GoCleanDataBase');"><bean:message key="label.clean.db" /></a></li>
 					</ul>
 				</li>
 				<li><a href="#"><bean:message key="label.contact" /></a></li>

@@ -13,4 +13,9 @@ public class DatabaseDao extends GenericDao {
 		return (Database) criteria.list().get(0);
 	}
 
+	public Database getByName(String name){
+		Criteria criteria = getSession().createCriteria(Database.class);
+		criteria.add(Restrictions.eq("name", name));
+		return (Database) criteria.list().get(0);
+	}
 }

@@ -1,5 +1,6 @@
 package br.ufpr.dao;
 
+import java.sql.PreparedStatement;
 import java.util.List;
 
 import org.hibernate.HibernateException;
@@ -82,5 +83,4 @@ public abstract class GenericDao {
     protected Session getSession() {
 		return HibernateFactory.openSession();
 	}
-
 }

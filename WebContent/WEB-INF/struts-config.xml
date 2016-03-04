@@ -20,6 +20,14 @@
 		<action path="/ProcessRdbToOnto" type="br.ufpr.action.ProcessRdbToOntoAction" name="rdbToOntoForm">
 			<forward name="success" path="tiles.rdbToOnto" />
 		</action>
+		
+		<action path="/GoCleanDataBase" type="br.ufpr.action.GoRdbToOntoAction" name="rdbToOntoForm">
+			<forward name="success" path="tiles.cleanDataBase" />
+		</action>
+		
+		<action path="/CleanDataBase" type="br.ufpr.action.CleanDataBaseAction" name="rdbToOntoForm">
+			<forward name="success" path="tiles.cleanDataBase" />
+		</action>
 	</action-mappings>
 	
 	<controller processorClass="org.apache.struts.tiles.TilesRequestProcessor"/>

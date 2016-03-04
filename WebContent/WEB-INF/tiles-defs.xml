@@ -16,5 +16,9 @@
 	<definition name="tiles.rdbToOnto" extends="mainLayout">
 		<put name="body" value="/pages/rdbToOnto.jsp"></put>	
 	</definition>
+	
+	<definition name="tiles.cleanDataBase" extends="mainLayout">
+		<put name="body" value="/pages/cleanDataBase.jsp"></put>	
+	</definition>
 
 </tiles-definitions>

@@ -44,7 +44,7 @@ public class RdbToOntoBO {
 	public Database importFile(RdbToOntoForm form) {
 
 		Database database = new Database();
-		database.setName(form.getDatabaseName());
+		database.setName(form.getDatabaseName().toLowerCase());
 
 		// Salvando o nome do banco de dados na T001.
 		databaseDao.saveOrUpdate(database);
