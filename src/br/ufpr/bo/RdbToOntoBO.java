@@ -96,6 +96,7 @@ public class RdbToOntoBO {
 				table.setDescription(fields[4]);
 				table.setAssociative("1".equals(fields[6]) ? true : false);
 
+				// Cadastrando na T002.
 				tableDao.saveOrUpdate(table);
 				
 				DatabaseDomain databaseDomain = databaseDomainDao.getByDescription(fields[5]);
@@ -208,7 +209,7 @@ public class RdbToOntoBO {
 				column.setDatatypeDb(datatypeDb);
 			}
 			else {
-				// Deve cadastrar o datatype.
+				// Deve cadastrar o datatype (T005).
 				datatypeDb = new DatatypeDb();
 				datatypeDb.setDescription(fields[8].toLowerCase());
 				datatypeDao.saveOrUpdate(datatypeDb);
@@ -243,7 +244,7 @@ public class RdbToOntoBO {
 
 		column.setIndColumnCheck("1".equals(fields[18]) ? true : false);
 
-		// Salvando a coluna.
+		// Salvando a coluna (T003).
 		columnDao.saveOrUpdate(column);
 
 		// Se informou o checkSubject.

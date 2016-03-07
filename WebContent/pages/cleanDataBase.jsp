@@ -4,10 +4,6 @@
 
 <script type="text/javascript">
 	function submitForm(){
-		if($("#databaseName").val() == ""){
-			$(".alert-danger").show();
-			return;
-		}
 		var form = document.forms[0];
 		form.action = "<html:rewrite page='/CleanDataBase.do' />";
 		form.submit();
@@ -30,11 +26,6 @@
 					</div>
               	</html:messages>
  			</logic:messagesPresent>
-			
-			<div class="form-group">
-				<label for="databaseName"><bean:message key="label.database.name" />:</label>
-				<html:text name="rdbToOntoForm" property="databaseName" styleClass="form-control" styleId="databaseName" />
-			</div>
 			
 			<button type="button" onclick="javascript:submitForm();" class="btn btn-primary"><bean:message key="button.submit" /></button>
 			

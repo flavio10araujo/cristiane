@@ -57,5 +57,4 @@ public class HibernateFactory {
 			System.out.println("Couldn't rollback Transaction");
 		}
 	}
-
 }

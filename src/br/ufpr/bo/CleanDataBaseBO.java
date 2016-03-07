@@ -1,6 +1,7 @@
 package br.ufpr.bo;
 
-import br.ufpr.bean.Database;
+import java.sql.SQLException;
+
 import br.ufpr.dao.DatabaseDao;
 
 public class CleanDataBaseBO {
@@ -8,23 +9,12 @@ public class CleanDataBaseBO {
 	DatabaseDao databaseDao = new DatabaseDao();
 
 	/**
-	 * Função utilizada para apagar todos os dados relacionados ao banco passado.
+	 * Função utilizada para apagar todos os dados do banco.
 	 * 
-	 * @param form
 	 * @return
+	 * @throws SQLException 
 	 */
-	public Database cleanDataBase(String databaseName) {
-		Database database = null;
-		
-		try {
-			database = databaseDao.getByName(databaseName.toLowerCase());
-		}
-		catch (Exception e) {
-			return database;
-		}
-		
-		databaseDao.delete(database);
-		
-		return database;
+	public void cleanDataBase() throws SQLException {
+		databaseDao.cleanDataBase();
 	}
 }
