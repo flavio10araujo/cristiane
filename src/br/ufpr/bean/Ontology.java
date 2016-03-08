@@ -8,19 +8,21 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Column;
 
 @Entity
-@javax.persistence.Table(name = "t016_ontology")
+@Table(name = "t016_ontology")
 public class Ontology implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@javax.persistence.Column(name = "c016_ontology_id", nullable = false, unique = true)
+	@Column(name = "c016_ontology_id", nullable = false, unique = true)
 	private Long id;
 
-	@javax.persistence.Column(name = "c016_ontology_name", nullable = false)
+	@Column(name = "c016_ontology_name", nullable = false)
 	private String name;
 	
 	@ManyToOne

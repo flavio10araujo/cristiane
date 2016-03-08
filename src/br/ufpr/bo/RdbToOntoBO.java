@@ -11,15 +11,18 @@ import br.ufpr.bean.ColumnCheckValue;
 import br.ufpr.bean.Database;
 import br.ufpr.bean.DatabaseDomain;
 import br.ufpr.bean.DatatypeDb;
+import br.ufpr.bean.Ontology;
 import br.ufpr.bean.Table;
 import br.ufpr.bean.TableDatabaseDomain;
 import br.ufpr.dao.CheckSubjectDao;
 import br.ufpr.dao.CheckValueDao;
+import br.ufpr.dao.ClassDao;
 import br.ufpr.dao.ColumnCheckValueDao;
 import br.ufpr.dao.ColumnDao;
 import br.ufpr.dao.DatabaseDao;
 import br.ufpr.dao.DatabaseDomainDao;
 import br.ufpr.dao.DatatypeDao;
+import br.ufpr.dao.OntologyDao;
 import br.ufpr.dao.TableDao;
 import br.ufpr.dao.TableDatabaseDomainDao;
 import br.ufpr.form.RdbToOntoForm;
@@ -35,6 +38,8 @@ public class RdbToOntoBO {
 	ColumnCheckValueDao columnCheckValueDao = new ColumnCheckValueDao();
 	DatabaseDomainDao databaseDomainDao = new DatabaseDomainDao();
 	TableDatabaseDomainDao tableDatabaseDomainDao = new TableDatabaseDomainDao();
+	OntologyDao ontologyDao = new OntologyDao();
+	ClassDao classDao = new ClassDao();
 
 	/**
 	 * 
@@ -44,10 +49,30 @@ public class RdbToOntoBO {
 	public Database importFile(RdbToOntoForm form) {
 
 		Database database = new Database();
+		Ontology ontology = null;
+		
 		database.setName(form.getDatabaseName().toLowerCase());
 
 		// Salvando o nome do banco de dados na T001.
 		databaseDao.saveOrUpdate(database);
+		
+		try {
+			// Chama a função que importa a primeira ontologia na T016.
+			ontology = importOntology(database);
+		}
+		catch (Exception e1) {
+			e1.printStackTrace();
+			return null;
+		}
+		
+		try {
+			// Chama a função que importa a class Thing na T011.
+			importClass(ontology);
+		}
+		catch (Exception e1) {
+			e1.printStackTrace();
+			return null;
+		}
 
 		try {
 			// Chama a função que importa as tabelas na T002.
@@ -70,6 +95,29 @@ public class RdbToOntoBO {
 		return database;
 	}
 
+	/**
+	 * 
+	 * @param database
+	 */
+	public Ontology importOntology(Database database) {
+		Ontology ontology = new Ontology();
+		ontology.setName(database.getName());
+		ontology.setDatabase(database);
+		ontologyDao.saveOrUpdate(ontology);
+		return ontology;
+	}
+	
+	/**
+	 * 
+	 * @param ontology
+	 */
+	public void importClass(Ontology ontology) {
+		br.ufpr.bean.Class c = new br.ufpr.bean.Class();
+		c.setName("Thing");
+		c.setOntology(ontology);
+		classDao.saveOrUpdate(c);
+	}
+	
 	/**
 	 * 
 	 * @param form
