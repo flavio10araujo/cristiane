@@ -99,7 +99,7 @@ public class RdbToOntoBO {
 				// Cadastrando na T002.
 				tableDao.saveOrUpdate(table);
 				
-				DatabaseDomain databaseDomain = databaseDomainDao.getByDescription(fields[5]);
+				DatabaseDomain databaseDomain = databaseDomainDao.getByDescription(database, fields[5]);
 
 				// Se não encontrou o databaseDomain (T008) no banco, deve cadastrá-lo.
 				if (databaseDomain == null) {
