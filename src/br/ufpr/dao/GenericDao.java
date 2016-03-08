@@ -87,12 +87,22 @@ public abstract class GenericDao {
 		return objects;
 	}
 
+	/**
+	 * 
+	 * @return
+	 * @throws SQLException
+	 */
 	protected Connection getConnection() throws SQLException {
 		startOperation();
 		SessionImplementor sim = (SessionImplementor) session;
 		return sim.connection();
 	}
 
+	/**
+	 * 
+	 * @param sql
+	 * @throws SQLException
+	 */
 	protected void executeQuery(String[] sql) throws SQLException {
 		try {
 			Statement stmt = getConnection().createStatement();

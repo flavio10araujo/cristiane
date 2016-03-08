@@ -26,6 +26,7 @@
 		<mapping class="br.ufpr.bean.TableDatabaseDomain" />
 		<mapping class="br.ufpr.bean.Ontology" />
 		<mapping class="br.ufpr.bean.Class" />
+		<mapping class="br.ufpr.bean.Hierarchy" />
 		<!-- Mapping -->
 	</session-factory>
 </hibernate-configuration>

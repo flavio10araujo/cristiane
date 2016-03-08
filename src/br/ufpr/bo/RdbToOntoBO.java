@@ -2,6 +2,7 @@ package br.ufpr.bo;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.List;
 import java.util.Scanner;
 
 import br.ufpr.bean.CheckSubject;
@@ -11,6 +12,7 @@ import br.ufpr.bean.ColumnCheckValue;
 import br.ufpr.bean.Database;
 import br.ufpr.bean.DatabaseDomain;
 import br.ufpr.bean.DatatypeDb;
+import br.ufpr.bean.Hierarchy;
 import br.ufpr.bean.Ontology;
 import br.ufpr.bean.Table;
 import br.ufpr.bean.TableDatabaseDomain;
@@ -22,10 +24,12 @@ import br.ufpr.dao.ColumnDao;
 import br.ufpr.dao.DatabaseDao;
 import br.ufpr.dao.DatabaseDomainDao;
 import br.ufpr.dao.DatatypeDao;
+import br.ufpr.dao.HierarchyDao;
 import br.ufpr.dao.OntologyDao;
 import br.ufpr.dao.TableDao;
 import br.ufpr.dao.TableDatabaseDomainDao;
 import br.ufpr.form.RdbToOntoForm;
+import br.ufpr.util.Util;
 
 public class RdbToOntoBO {
 
@@ -40,6 +44,7 @@ public class RdbToOntoBO {
 	TableDatabaseDomainDao tableDatabaseDomainDao = new TableDatabaseDomainDao();
 	OntologyDao ontologyDao = new OntologyDao();
 	ClassDao classDao = new ClassDao();
+	HierarchyDao hierarchyDao = new HierarchyDao();
 
 	/**
 	 * 
@@ -50,6 +55,7 @@ public class RdbToOntoBO {
 
 		Database database = new Database();
 		Ontology ontology = null;
+		br.ufpr.bean.Class clazz = null;
 		
 		database.setName(form.getDatabaseName().toLowerCase());
 
@@ -67,7 +73,7 @@ public class RdbToOntoBO {
 		
 		try {
 			// Chama a função que importa a class Thing na T011.
-			importClass(ontology);
+			clazz = importClassThing(ontology);
 		}
 		catch (Exception e1) {
 			e1.printStackTrace();
@@ -77,6 +83,15 @@ public class RdbToOntoBO {
 		try {
 			// Chama a função que importa as tabelas na T002.
 			importTables(form, database);
+		}
+		catch (Exception e1) {
+			e1.printStackTrace();
+			return null;
+		}
+
+		try {
+			// Chama a função que importa os valores de database domain (T008) na T011.
+			importClassDatabaseDomain(database, clazz);
 		}
 		catch (Exception e1) {
 			e1.printStackTrace();
@@ -110,12 +125,14 @@ public class RdbToOntoBO {
 	/**
 	 * 
 	 * @param ontology
+	 * @return
 	 */
-	public void importClass(Ontology ontology) {
+	public br.ufpr.bean.Class importClassThing(Ontology ontology) {
 		br.ufpr.bean.Class c = new br.ufpr.bean.Class();
 		c.setName("Thing");
 		c.setOntology(ontology);
 		classDao.saveOrUpdate(c);
+		return c;
 	}
 	
 	/**
@@ -167,6 +184,34 @@ public class RdbToOntoBO {
 		}
 
 		scanner.close();
+	}
+	
+	/**
+	 * Busca todos os registros da T008 relacionados a determinado banco de dados.
+	 * Para cada um dos registros encontrados, insere um registro na T011.
+	 * Além disso, insere um registro na T012 relacionando o registro recém-inserido na T011 e a Thing.
+	 * 
+	 * @param database
+	 */
+	public void importClassDatabaseDomain(Database database, br.ufpr.bean.Class clazz) {
+		List<DatabaseDomain> lista = databaseDomainDao.getByDatabase(database);
+		
+		if (lista == null || lista.size() == 0) {
+			return;
+		}
+		
+		for (DatabaseDomain databaseDomain : lista) {
+			br.ufpr.bean.Class c = new br.ufpr.bean.Class();
+			c.setDatabaseDomain(databaseDomain);
+			c.setName(Util.funcaoMaiuscula(databaseDomain.getDescription()));
+			classDao.saveOrUpdate(c);
+			
+			Hierarchy hierarchy = new Hierarchy();
+			hierarchy.setSuperClass(clazz);
+			hierarchy.setSubClass(c);
+			
+			hierarchyDao.saveOrUpdate(hierarchy);
+		}
 	}
 	
 	/**

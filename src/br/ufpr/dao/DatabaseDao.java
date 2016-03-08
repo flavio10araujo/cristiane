@@ -22,17 +22,18 @@ public class DatabaseDao extends GenericDao {
 	}
 	
 	public void cleanDataBase() throws SQLException {
-		String[] sqls = new String[8];
+		String[] sqls = new String[10];
 		
-		//SELECT * FROM rdbtoonto.t011_class;
 		sqls[0] = "DELETE FROM t009_column_check_value";
 		sqls[1] = "DELETE FROM t006_check_value";
-		sqls[2] = "DELETE FROM t003_column";
-		sqls[3] = "DELETE FROM t010_table_db_domain";
-		sqls[4] = "DELETE FROM t008_database_domain";
-		sqls[5] = "DELETE FROM t002_table";
-		sqls[6] = "DELETE FROM t016_ontology";
-		sqls[7] = "DELETE FROM t001_database";
+		sqls[2] = "DELETE FROM t012_hierarchy";
+		sqls[3] = "DELETE FROM t011_class";
+		sqls[4] = "DELETE FROM t003_column";
+		sqls[5] = "DELETE FROM t010_table_db_domain";
+		sqls[6] = "DELETE FROM t008_database_domain";
+		sqls[7] = "DELETE FROM t002_table";
+		sqls[8] = "DELETE FROM t016_ontology";
+		sqls[9] = "DELETE FROM t001_database";
 		
 		executeQuery(sqls);
 	}
