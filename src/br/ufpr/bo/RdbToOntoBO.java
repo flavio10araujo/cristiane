@@ -55,7 +55,6 @@ public class RdbToOntoBO {
 
 		Database database = new Database();
 		Ontology ontology = null;
-		br.ufpr.bean.Class clazz = null;
 		
 		database.setName(form.getDatabaseName().toLowerCase());
 
@@ -72,26 +71,8 @@ public class RdbToOntoBO {
 		}
 		
 		try {
-			// Chama a função que importa a class Thing na T011.
-			clazz = importClassThing(ontology);
-		}
-		catch (Exception e1) {
-			e1.printStackTrace();
-			return null;
-		}
-
-		try {
 			// Chama a função que importa as tabelas na T002.
 			importTables(form, database);
-		}
-		catch (Exception e1) {
-			e1.printStackTrace();
-			return null;
-		}
-
-		try {
-			// Chama a função que importa os valores de database domain (T008) na T011.
-			importClassDatabaseDomain(database, clazz);
 		}
 		catch (Exception e1) {
 			e1.printStackTrace();
@@ -104,6 +85,15 @@ public class RdbToOntoBO {
 		}
 		catch (Exception e) {
 			e.printStackTrace();
+			return null;
+		}
+		
+		try {
+			// Chama a função que importa os valores na T011.
+			importClass(database, ontology);
+		}
+		catch (Exception e1) {
+			e1.printStackTrace();
 			return null;
 		}
 
@@ -120,19 +110,6 @@ public class RdbToOntoBO {
 		ontology.setDatabase(database);
 		ontologyDao.saveOrUpdate(ontology);
 		return ontology;
-	}
-	
-	/**
-	 * 
-	 * @param ontology
-	 * @return
-	 */
-	public br.ufpr.bean.Class importClassThing(Ontology ontology) {
-		br.ufpr.bean.Class c = new br.ufpr.bean.Class();
-		c.setName("Thing");
-		c.setOntology(ontology);
-		classDao.saveOrUpdate(c);
-		return c;
 	}
 	
 	/**
@@ -184,34 +161,6 @@ public class RdbToOntoBO {
 		}
 
 		scanner.close();
-	}
-	
-	/**
-	 * Busca todos os registros da T008 relacionados a determinado banco de dados.
-	 * Para cada um dos registros encontrados, insere um registro na T011.
-	 * Além disso, insere um registro na T012 relacionando o registro recém-inserido na T011 e a Thing.
-	 * 
-	 * @param database
-	 */
-	public void importClassDatabaseDomain(Database database, br.ufpr.bean.Class clazz) {
-		List<DatabaseDomain> lista = databaseDomainDao.getByDatabase(database);
-		
-		if (lista == null || lista.size() == 0) {
-			return;
-		}
-		
-		for (DatabaseDomain databaseDomain : lista) {
-			br.ufpr.bean.Class c = new br.ufpr.bean.Class();
-			c.setDatabaseDomain(databaseDomain);
-			c.setName(Util.funcaoMaiuscula(databaseDomain.getDescription()));
-			classDao.saveOrUpdate(c);
-			
-			Hierarchy hierarchy = new Hierarchy();
-			hierarchy.setSuperClass(clazz);
-			hierarchy.setSubClass(c);
-			
-			hierarchyDao.saveOrUpdate(hierarchy);
-		}
 	}
 	
 	/**
@@ -369,6 +318,91 @@ public class RdbToOntoBO {
 				columnCheckValue.setCheckValue(checkValue);
 				columnCheckValueDao.saveOrUpdate(columnCheckValue);
 			}
+		}
+	}
+	
+	/**
+	 * Cadastra os valores na T011.
+	 * 
+	 * @param database
+	 * @param ontology
+	 */
+	public void importClass(Database database, Ontology ontology) {
+		// Chama a função que importa a class Thing na T011.
+		br.ufpr.bean.Class clazz = importClassThing(ontology);
+		
+		// Chama a função que importa os valores de database domain (T008) na T011.
+		importClassDatabaseDomain(database, clazz);
+		
+		// Chama a função que importa os valores de tables (T002) na T011.
+		importClassTable(database, clazz);
+	}
+	
+	/**
+	 * 
+	 * @param ontology
+	 * @return
+	 */
+	public br.ufpr.bean.Class importClassThing(Ontology ontology) {
+		br.ufpr.bean.Class c = new br.ufpr.bean.Class();
+		c.setName("Thing");
+		c.setOntology(ontology);
+		classDao.saveOrUpdate(c);
+		return c;
+	}
+	
+	/**
+	 * Busca todos os registros da T008 relacionados a determinado banco de dados.
+	 * Para cada um dos registros encontrados, insere um registro na T011.
+	 * Além disso, insere um registro na T012 relacionando o registro recém-inserido na T011 e a Thing.
+	 * 
+	 * @param database
+	 */
+	public void importClassDatabaseDomain(Database database, br.ufpr.bean.Class clazz) {
+		List<DatabaseDomain> lista = databaseDomainDao.getByDatabase(database);
+		
+		if (lista == null || lista.size() == 0) {
+			return;
+		}
+		
+		for (DatabaseDomain databaseDomain : lista) {
+			br.ufpr.bean.Class c = new br.ufpr.bean.Class();
+			c.setDatabaseDomain(databaseDomain);
+			c.setName(Util.funcaoMaiuscula(databaseDomain.getDescription()));
+			classDao.saveOrUpdate(c);
+			
+			Hierarchy hierarchy = new Hierarchy();
+			hierarchy.setSuperClass(clazz);
+			hierarchy.setSubClass(c);
+			
+			hierarchyDao.saveOrUpdate(hierarchy);
+		}
+	}
+	
+	/**
+	 * Busca todos os registros da T002 relacionados a determinado banco de dados.
+	 * Para cada um dos registros encontrados, insere um registro na T011.
+	 * Além disso, insere um registro na T012 relacionando o registro recém-inserido na T011 e a Thing.
+	 * @param database
+	 */
+	public void importClassTable(Database database, br.ufpr.bean.Class clazz) {
+		List<Table> lista = tableDao.getByDatabase(database);
+		
+		if (lista == null || lista.size() == 0) {
+			return;
+		}
+		
+		for (Table table : lista) {
+			br.ufpr.bean.Class c = new br.ufpr.bean.Class();
+			c.setTable(table);
+			c.setName(Util.funcaoMaiuscula(table.getLogicalName()));
+			classDao.saveOrUpdate(c);
+			
+			Hierarchy hierarchy = new Hierarchy();
+			hierarchy.setSuperClass(clazz);
+			hierarchy.setSubClass(c);
+			
+			hierarchyDao.saveOrUpdate(hierarchy);
 		}
 	}
 }
