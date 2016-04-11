@@ -17,6 +17,7 @@
 		<mapping class="br.ufpr.bean.Database" />
 		<mapping class="br.ufpr.bean.DatabaseDomain" />
 		<mapping class="br.ufpr.bean.DatatypeDb" />
+		<mapping class="br.ufpr.bean.DatatypeOnto" />
 		<mapping class="br.ufpr.bean.Table" />
 		<mapping class="br.ufpr.bean.Column" />
 		<mapping class="br.ufpr.bean.CheckValue" />

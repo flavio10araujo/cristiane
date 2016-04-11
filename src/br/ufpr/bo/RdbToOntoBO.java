@@ -12,6 +12,7 @@ import br.ufpr.bean.ColumnCheckValue;
 import br.ufpr.bean.Database;
 import br.ufpr.bean.DatabaseDomain;
 import br.ufpr.bean.DatatypeDb;
+import br.ufpr.bean.DatatypeOnto;
 import br.ufpr.bean.Hierarchy;
 import br.ufpr.bean.Ontology;
 import br.ufpr.bean.Table;
@@ -23,7 +24,8 @@ import br.ufpr.dao.ColumnCheckValueDao;
 import br.ufpr.dao.ColumnDao;
 import br.ufpr.dao.DatabaseDao;
 import br.ufpr.dao.DatabaseDomainDao;
-import br.ufpr.dao.DatatypeDao;
+import br.ufpr.dao.DatatypeDbDao;
+import br.ufpr.dao.DatatypeOntoDao;
 import br.ufpr.dao.HierarchyDao;
 import br.ufpr.dao.OntologyDao;
 import br.ufpr.dao.TableDao;
@@ -36,7 +38,8 @@ public class RdbToOntoBO {
 	DatabaseDao databaseDao = new DatabaseDao();
 	TableDao tableDao = new TableDao();
 	ColumnDao columnDao = new ColumnDao();
-	DatatypeDao datatypeDao = new DatatypeDao();
+	DatatypeDbDao datatypeDbDao = new DatatypeDbDao();
+	DatatypeOntoDao datatypeOntoDao = new DatatypeOntoDao();
 	CheckSubjectDao checkSubjectDao = new CheckSubjectDao();
 	CheckValueDao checkValueDao = new CheckValueDao();
 	ColumnCheckValueDao columnCheckValueDao = new ColumnCheckValueDao();
@@ -244,7 +247,7 @@ public class RdbToOntoBO {
 
 		// Se informou o datatype.
 		if (!"".equals(fields[8])) {
-			DatatypeDb datatypeDb = datatypeDao.getByDescription(fields[8]);
+			DatatypeDb datatypeDb = datatypeDbDao.getByDescription(fields[8]);
 
 			// Se encontrou o datatype no banco.
 			if (datatypeDb != null) {
@@ -254,8 +257,14 @@ public class RdbToOntoBO {
 				// Deve cadastrar o datatype (T005).
 				datatypeDb = new DatatypeDb();
 				datatypeDb.setDescription(fields[8].toLowerCase());
-				datatypeDao.saveOrUpdate(datatypeDb);
+				datatypeDbDao.saveOrUpdate(datatypeDb);
 				column.setDatatypeDb(datatypeDb);
+				
+				// Clonar o datatype na T018.
+				DatatypeOnto datatypeOnto = new DatatypeOnto();
+				datatypeOnto.setDescription(datatypeDb.getDescription());
+				datatypeOnto.setDatatypeDb(datatypeDb);
+				datatypeOntoDao.saveOrUpdate(datatypeOnto);
 			}
 		}
 
@@ -332,10 +341,10 @@ public class RdbToOntoBO {
 		br.ufpr.bean.Class clazz = importClassThing(ontology);
 		
 		// Chama a função que importa os valores de database domain (T008) na T011.
-		importClassDatabaseDomain(database, clazz);
+		importClassDatabaseDomain(database, clazz, ontology);
 		
 		// Chama a função que importa os valores de tables (T002) na T011.
-		importClassTable(database, clazz);
+		importClassTable(database, clazz, ontology);
 	}
 	
 	/**
@@ -357,18 +366,25 @@ public class RdbToOntoBO {
 	 * Além disso, insere um registro na T012 relacionando o registro recém-inserido na T011 e a Thing.
 	 * 
 	 * @param database
+	 * @param clazz
+	 * @param ontology
 	 */
-	public void importClassDatabaseDomain(Database database, br.ufpr.bean.Class clazz) {
+	public void importClassDatabaseDomain(Database database, br.ufpr.bean.Class clazz, Ontology ontology) {
 		List<DatabaseDomain> lista = databaseDomainDao.getByDatabase(database);
 		
 		if (lista == null || lista.size() == 0) {
 			return;
 		}
 		
+		String name;
+		
 		for (DatabaseDomain databaseDomain : lista) {
 			br.ufpr.bean.Class c = new br.ufpr.bean.Class();
 			c.setDatabaseDomain(databaseDomain);
-			c.setName(Util.funcaoMaiuscula(databaseDomain.getDescription()));
+			name = Util.funcaoMaiuscula(databaseDomain.getDescription());
+			name = "g" + name;
+			c.setName(name);
+			c.setOntology(ontology);
 			classDao.saveOrUpdate(c);
 			
 			Hierarchy hierarchy = new Hierarchy();
@@ -383,19 +399,32 @@ public class RdbToOntoBO {
 	 * Busca todos os registros da T002 relacionados a determinado banco de dados.
 	 * Para cada um dos registros encontrados, insere um registro na T011.
 	 * Além disso, insere um registro na T012 relacionando o registro recém-inserido na T011 e a Thing.
+	 * 
 	 * @param database
+	 * @param clazz
+	 * @param ontology
 	 */
-	public void importClassTable(Database database, br.ufpr.bean.Class clazz) {
+	public void importClassTable(Database database, br.ufpr.bean.Class clazz, Ontology ontology) {
 		List<Table> lista = tableDao.getByDatabase(database);
 		
 		if (lista == null || lista.size() == 0) {
 			return;
 		}
 		
+		String name;
+		
 		for (Table table : lista) {
 			br.ufpr.bean.Class c = new br.ufpr.bean.Class();
 			c.setTable(table);
-			c.setName(Util.funcaoMaiuscula(table.getLogicalName()));
+			name = Util.funcaoMaiuscula(table.getLogicalName());
+			
+			if (name == null || "".equals(name)) {
+				name = Util.funcaoMaiuscula(table.getPhysicalName());
+			}
+			
+			name = "e" + name;
+			c.setName(name);
+			c.setOntology(ontology);
 			classDao.saveOrUpdate(c);
 			
 			Hierarchy hierarchy = new Hierarchy();

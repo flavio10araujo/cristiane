@@ -5,13 +5,15 @@ import java.text.Normalizer;
 public class Util {
 
 	/*public static void main(String[] Args) {
-		System.out.println(funcaoMaiuscula("Cadastros básicos do sistema"));
-		System.out.println(funcaoMinuscula("Cadastros básicos do sistema"));
+		System.out.println(funcaoMaiuscula("01_Cadastros básicos do sistema"));
+		System.out.println(funcaoMinuscula("01_Cadastros básicos do sistema"));
 	}*/
 	
 	/**
 	 * Função para remover acentos, espaços em branco, preposições e formar uma única palavra com as primeiras letras em maiúsculo.
 	 * Ex.: Cadastros básicos do sistema -> CadastrosBasicosSistema
+	 * Alteração: remover também os números e sinal de underline.
+	 * Ex.: 01_Cadastros básicos do sistema -> CadastrosBasicosSistema
 	 * 
 	 * @param str
 	 * @return
@@ -20,6 +22,8 @@ public class Util {
 		if (str == null || "".equals(str)) {
 			return "";
 		}
+		
+		str = removeNumbersAndOthers(str);
 		
 		String[] chunks = str.toLowerCase().split(" ");
 		StringBuilder retorno = new StringBuilder("");
@@ -91,4 +95,16 @@ public class Util {
         }
         return sb.toString();
     }
+	
+	public static String removeNumbersAndOthers(String str) {
+		if (str == null || "".equals(str)) {
+	        return "";
+	    }
+		
+		//str.replaceAll("[^A-Za-z]", ""); // Only letters.
+		
+		str = str.replaceAll("[0-9]", ""); // Remove all the numbers.
+		str = str.replaceAll("_", "");
+		return str;
+	}
 }

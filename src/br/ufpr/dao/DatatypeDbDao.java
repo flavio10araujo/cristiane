@@ -5,7 +5,7 @@ import org.hibernate.criterion.Restrictions;
 
 import br.ufpr.bean.DatatypeDb;
 
-public class DatatypeDao extends GenericDao {
+public class DatatypeDbDao extends GenericDao {
 
 	public DatatypeDb getByDescription(String description) {
 		if (description == null || "".equals(description)) {

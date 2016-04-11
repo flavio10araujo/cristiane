@@ -7,6 +7,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -20,8 +22,13 @@ public class DatatypeOnto implements Serializable {
 	@Column(name = "c018_datatype_id", nullable = false, unique = true)
 	private Long id;
 	
-	@Column(name = "c018_description")
+	@Column(name = "c018_description", nullable = false)
 	private String description;
+	
+	
+	@ManyToOne
+	@JoinColumn(name = "c005_datatype_db_id")
+	private DatatypeDb datatypeDb;
 
 	public Long getId() {
 		return id;
@@ -37,5 +44,13 @@ public class DatatypeOnto implements Serializable {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public DatatypeDb getDatatypeDb() {
+		return datatypeDb;
+	}
+
+	public void setDatatypeDb(DatatypeDb datatypeDb) {
+		this.datatypeDb = datatypeDb;
 	}
 }
