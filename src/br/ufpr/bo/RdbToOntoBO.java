@@ -345,6 +345,9 @@ public class RdbToOntoBO {
 		
 		// Chama a função que importa os valores de tables (T002) na T011.
 		importClassTable(database, clazz, ontology);
+		
+		// Chama a função que importa os valores de check subject (T007) na T011.
+		importClassCheckSubject(database, clazz, ontology);
 	}
 	
 	/**
@@ -432,6 +435,49 @@ public class RdbToOntoBO {
 			hierarchy.setSubClass(c);
 			
 			hierarchyDao.saveOrUpdate(hierarchy);
+		}
+	}
+	
+	/**
+	 * Busca todos os registros da T007 que ainda não estão na T011.
+	 * Para cada um dos registros encontrados, insere um registro na T011.
+	 * Além disso, insere um registro na T012 relacionando o registro recém-inserido na T011 e a Thing.
+	 * 
+	 * @param database
+	 * @param clazz
+	 * @param ontology
+	 */
+	public void importClassCheckSubject(Database database, br.ufpr.bean.Class clazz, Ontology ontology) {
+		// Busca todos os itens da T007.
+		List<CheckSubject> lista = checkSubjectDao.getAll();
+		
+		if (lista == null || lista.size() == 0) {
+			return;
+		}
+		
+		String name;
+		br.ufpr.bean.Class clazzAux;
+		
+		for (CheckSubject checkSubject : lista) {
+			// Busca na T011 se o item da T007 existe.
+			clazzAux = classDao.getByCheckSubject(checkSubject);
+			
+			// Se não existe na T011, deve cadastrar.
+			if (clazzAux == null) {
+				br.ufpr.bean.Class c = new br.ufpr.bean.Class();
+				c.setCheckSubject(checkSubject);
+				name = Util.funcaoMaiuscula(checkSubject.getDescription());
+				name = "v" + name;
+				c.setName(name);
+				c.setOntology(ontology);
+				classDao.saveOrUpdate(c);
+				
+				Hierarchy hierarchy = new Hierarchy();
+				hierarchy.setSuperClass(clazz);
+				hierarchy.setSubClass(c);
+				
+				hierarchyDao.saveOrUpdate(hierarchy);
+			}
 		}
 	}
 }

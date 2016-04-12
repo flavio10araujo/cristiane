@@ -22,7 +22,7 @@ public class DatabaseDao extends GenericDao {
 	}
 	
 	public void cleanDataBase() throws SQLException {
-		String[] sqls = new String[10];
+		String[] sqls = new String[11];
 		
 		sqls[0] = "DELETE FROM t009_column_check_value";
 		sqls[1] = "DELETE FROM t006_check_value";
@@ -34,6 +34,7 @@ public class DatabaseDao extends GenericDao {
 		sqls[7] = "DELETE FROM t002_table";
 		sqls[8] = "DELETE FROM t016_ontology";
 		sqls[9] = "DELETE FROM t001_database";
+		sqls[10] = "DELETE FROM t007_check_subject";
 		
 		executeQuery(sqls);
 	}
