@@ -14,6 +14,7 @@ import br.ufpr.bean.DatabaseDomain;
 import br.ufpr.bean.DatatypeDb;
 import br.ufpr.bean.DatatypeOnto;
 import br.ufpr.bean.Hierarchy;
+import br.ufpr.bean.Instance;
 import br.ufpr.bean.Ontology;
 import br.ufpr.bean.Table;
 import br.ufpr.bean.TableDatabaseDomain;
@@ -27,6 +28,7 @@ import br.ufpr.dao.DatabaseDomainDao;
 import br.ufpr.dao.DatatypeDbDao;
 import br.ufpr.dao.DatatypeOntoDao;
 import br.ufpr.dao.HierarchyDao;
+import br.ufpr.dao.InstanceDao;
 import br.ufpr.dao.OntologyDao;
 import br.ufpr.dao.TableDao;
 import br.ufpr.dao.TableDatabaseDomainDao;
@@ -48,6 +50,7 @@ public class RdbToOntoBO {
 	OntologyDao ontologyDao = new OntologyDao();
 	ClassDao classDao = new ClassDao();
 	HierarchyDao hierarchyDao = new HierarchyDao();
+	InstanceDao instanceDao = new InstanceDao();
 
 	/**
 	 * 
@@ -94,6 +97,15 @@ public class RdbToOntoBO {
 		try {
 			// Chama a função que importa os valores na T011.
 			importClass(database, ontology);
+		}
+		catch (Exception e1) {
+			e1.printStackTrace();
+			return null;
+		}
+		
+		try {
+			// Chama a função que importa os valores na T015.
+			importInstance();
 		}
 		catch (Exception e1) {
 			e1.printStackTrace();
@@ -314,18 +326,25 @@ public class RdbToOntoBO {
 			String[] checkAbreviations = fields[20].split(",", -1);
 
 			for (int j = 0; j < checkValues.length; j++) {
-				CheckValue checkValue = new CheckValue();
-				checkValue.setDescription(checkValues[j]);
-				checkValue.setAbreviation(checkAbreviations[j]);
-				checkValue.setCheckSubject(checkSubject);
-				// Inserindo na T006.
-				checkValueDao.saveOrUpdate(checkValue);
-
-				// Inserindo na T009.
-				ColumnCheckValue columnCheckValue = new ColumnCheckValue();
-				columnCheckValue.setColumn(column);
-				columnCheckValue.setCheckValue(checkValue);
-				columnCheckValueDao.saveOrUpdate(columnCheckValue);
+				
+				// Verificar se um checkValue com essa description + abreviation já existe na T006.
+				CheckValue checkValueAux = checkValueDao.getByDescriptionAndAbreviation(checkValues[j], checkAbreviations[j]);
+				
+				// Se não existir, deve ser cadastrado.
+				if (checkValueAux == null) {
+					CheckValue checkValue = new CheckValue();
+					checkValue.setDescription(checkValues[j]);
+					checkValue.setAbreviation(checkAbreviations[j]);
+					checkValue.setCheckSubject(checkSubject);
+					// Inserindo na T006.
+					checkValueDao.saveOrUpdate(checkValue);
+	
+					// Inserindo na T009.
+					ColumnCheckValue columnCheckValue = new ColumnCheckValue();
+					columnCheckValue.setColumn(column);
+					columnCheckValue.setCheckValue(checkValue);
+					columnCheckValueDao.saveOrUpdate(columnCheckValue);
+				}
 			}
 		}
 	}
@@ -477,6 +496,50 @@ public class RdbToOntoBO {
 				hierarchy.setSubClass(c);
 				
 				hierarchyDao.saveOrUpdate(hierarchy);
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public void importInstance() {
+		// Buscar todos os itens da T011 que contenham algum valor na C007.
+		List<br.ufpr.bean.Class> lista = classDao.getWhenCheckSubjectNotNull();
+		
+		if (lista == null || lista.size() == 0) {
+			return;
+		}
+		
+		Instance instance;
+		String description;
+		
+		// Para cada item encontrado na T011, verificar na T015 se ele existe (através do C011_CLASS_ID).
+		for (br.ufpr.bean.Class clazz : lista) {
+			
+			instance = instanceDao.getByClass(clazz);
+
+			// Se não existir nenhum registro na T015 relacionado ao C011 passado, deve ser inserido.
+			if (instance == null) {
+				// Buscar na T006 quais os valores relacionados a esse C007.
+				List<CheckValue> checkValues = checkValueDao.getByCheckSubject(clazz.getCheckSubject());
+				
+				if (checkValues == null || checkValues.size() == 0) {
+					continue;
+				}
+
+				// Para cada registro encontrado, inserir um valor na T015.
+				for (CheckValue checkValue : checkValues) {
+					Instance newIntance = new Instance();
+					
+					description = clazz.getName();
+					description = description + "_" + Util.funcaoMaiuscula(checkValue.getDescription());
+					newIntance.setDescription(description);
+					
+					newIntance.setClazz(clazz);
+					newIntance.setOntology(clazz.getOntology());
+					instanceDao.saveOrUpdate(newIntance);
+				}
 			}
 		}
 	}

@@ -18,6 +18,7 @@
 		<mapping class="br.ufpr.bean.DatabaseDomain" />
 		<mapping class="br.ufpr.bean.DatatypeDb" />
 		<mapping class="br.ufpr.bean.DatatypeOnto" />
+		<mapping class="br.ufpr.bean.DatatypeProperty" />
 		<mapping class="br.ufpr.bean.Table" />
 		<mapping class="br.ufpr.bean.Column" />
 		<mapping class="br.ufpr.bean.CheckValue" />
@@ -28,6 +29,7 @@
 		<mapping class="br.ufpr.bean.Ontology" />
 		<mapping class="br.ufpr.bean.Class" />
 		<mapping class="br.ufpr.bean.Hierarchy" />
+		<mapping class="br.ufpr.bean.Instance" />
 		<!-- Mapping -->
 	</session-factory>
 </hibernate-configuration>

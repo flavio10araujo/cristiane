@@ -1,5 +1,7 @@
 package br.ufpr.dao;
 
+import java.util.List;
+
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
 
@@ -21,5 +23,12 @@ public class ClassDao extends GenericDao {
 		catch (Exception e) {
 			return null;
 		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<br.ufpr.bean.Class> getWhenCheckSubjectNotNull() {
+		Criteria criteria = getSession().createCriteria(br.ufpr.bean.Class.class);
+		criteria.add(Restrictions.isNotNull("checkSubject"));
+		return criteria.list();
 	}
 }

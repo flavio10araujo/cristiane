@@ -33,10 +33,6 @@ public class DatatypeProperty implements Serializable {
 	@JoinColumn(name = "c018_datatype_id")
 	private DatatypeOnto datatypeOnto;
 	
-	@ManyToOne
-	@JoinColumn(name = "c003_column_id")
-	private Column column;
-
 	public Long getId() {
 		return id;
 	}
@@ -67,13 +63,5 @@ public class DatatypeProperty implements Serializable {
 
 	public void setDatatypeOnto(DatatypeOnto datatypeOnto) {
 		this.datatypeOnto = datatypeOnto;
-	}
-
-	public Column getColumn() {
-		return column;
-	}
-
-	public void setColumn(Column column) {
-		this.column = column;
 	}
 }
