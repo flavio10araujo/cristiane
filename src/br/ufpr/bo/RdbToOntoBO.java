@@ -9,10 +9,12 @@ import br.ufpr.bean.CheckSubject;
 import br.ufpr.bean.CheckValue;
 import br.ufpr.bean.Column;
 import br.ufpr.bean.ColumnCheckValue;
+import br.ufpr.bean.ColumnToDatatypeProperty;
 import br.ufpr.bean.Database;
 import br.ufpr.bean.DatabaseDomain;
 import br.ufpr.bean.DatatypeDb;
 import br.ufpr.bean.DatatypeOnto;
+import br.ufpr.bean.DatatypeProperty;
 import br.ufpr.bean.Hierarchy;
 import br.ufpr.bean.Instance;
 import br.ufpr.bean.Ontology;
@@ -23,10 +25,12 @@ import br.ufpr.dao.CheckValueDao;
 import br.ufpr.dao.ClassDao;
 import br.ufpr.dao.ColumnCheckValueDao;
 import br.ufpr.dao.ColumnDao;
+import br.ufpr.dao.ColumnToDatatypePropertyDao;
 import br.ufpr.dao.DatabaseDao;
 import br.ufpr.dao.DatabaseDomainDao;
 import br.ufpr.dao.DatatypeDbDao;
 import br.ufpr.dao.DatatypeOntoDao;
+import br.ufpr.dao.DatatypePropertyDao;
 import br.ufpr.dao.HierarchyDao;
 import br.ufpr.dao.InstanceDao;
 import br.ufpr.dao.OntologyDao;
@@ -51,6 +55,8 @@ public class RdbToOntoBO {
 	ClassDao classDao = new ClassDao();
 	HierarchyDao hierarchyDao = new HierarchyDao();
 	InstanceDao instanceDao = new InstanceDao();
+	DatatypePropertyDao datatypePropertyDao = new DatatypePropertyDao();
+	ColumnToDatatypePropertyDao columnToDatatypePropertyDao = new ColumnToDatatypePropertyDao();
 
 	/**
 	 * 
@@ -106,6 +112,15 @@ public class RdbToOntoBO {
 		try {
 			// Chama a função que importa os valores na T015.
 			importInstance();
+		}
+		catch (Exception e1) {
+			e1.printStackTrace();
+			return null;
+		}
+		
+		try {
+			// Chama a função que importa os valores na T013.
+			importDatatypeProperty(database, ontology);
 		}
 		catch (Exception e1) {
 			e1.printStackTrace();
@@ -245,6 +260,12 @@ public class RdbToOntoBO {
 
 		column.setPhysicalName(fields[1]);
 		column.setLogicalName(fields[2]);
+		
+		// Se o logical name vier vazio, coloco o physical name em seu lugar.
+		if (column.getLogicalName() == null || "".equals(column.getLogicalName())) {
+			column.setLogicalName(Util.funcaoMaiuscula(column.getPhysicalName()));			
+		}
+		
 		column.setLogicalName2(fields[3]);
 
 		Table table = tableDao.getByPhysicalName(database.getId(), fields[7]);
@@ -540,6 +561,42 @@ public class RdbToOntoBO {
 					newIntance.setOntology(clazz.getOntology());
 					instanceDao.saveOrUpdate(newIntance);
 				}
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	public void importDatatypeProperty(Database database, Ontology ontology) {
+		// Buscar todas as colunas do database passado com C003_IND_DESCRIPTION = 1 e C003_IND_COLUMN_CHECK = 0.
+		List<Column> columns = columnDao.getByIndDescriptionAndIndColumnCheck(database.getId(), true, false);  
+		
+		if (columns == null || columns.size() == 0) {
+			return;
+		}
+		
+		String description;
+		
+		for (Column column : columns) {
+			// Inserir na T013.
+			DatatypeProperty datatypeProperty = new DatatypeProperty();			
+			description = "a" + Util.funcaoMaiuscula(column.getLogicalName());
+			datatypeProperty.setDescription(description);
+			datatypeProperty.setOntology(ontology);
+			
+			DatatypeOnto datatypeOnto = datatypeOntoDao.getByDatatypeDb(column.getDatatypeDb());
+			
+			if (datatypeOnto != null) {
+				datatypeProperty.setDatatypeOnto(datatypeOnto);
+				
+				datatypePropertyDao.saveOrUpdate(datatypeProperty);
+				
+				// Inserir na T020.
+				ColumnToDatatypeProperty columnToDatatypeProperty = new ColumnToDatatypeProperty();
+				columnToDatatypeProperty.setColumn(column);
+				columnToDatatypeProperty.setDatatypeProperty(datatypeProperty);
+				columnToDatatypePropertyDao.saveOrUpdate(columnToDatatypeProperty);
 			}
 		}
 	}
