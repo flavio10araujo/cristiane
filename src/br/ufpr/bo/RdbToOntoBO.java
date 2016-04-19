@@ -19,6 +19,7 @@ import br.ufpr.bean.DatatypeProperty;
 import br.ufpr.bean.Hierarchy;
 import br.ufpr.bean.Instance;
 import br.ufpr.bean.ObjectProperty;
+import br.ufpr.bean.ObjectPropertyDomainRange;
 import br.ufpr.bean.Ontology;
 import br.ufpr.bean.Table;
 import br.ufpr.bean.TableDatabaseDomain;
@@ -37,6 +38,7 @@ import br.ufpr.dao.DatatypePropertyDao;
 import br.ufpr.dao.HierarchyDao;
 import br.ufpr.dao.InstanceDao;
 import br.ufpr.dao.ObjectPropertyDao;
+import br.ufpr.dao.ObjectPropertyDomainRangeDao;
 import br.ufpr.dao.OntologyDao;
 import br.ufpr.dao.TableDao;
 import br.ufpr.dao.TableDatabaseDomainDao;
@@ -63,6 +65,7 @@ public class RdbToOntoBO {
 	ColumnToDatatypePropertyDao columnToDatatypePropertyDao = new ColumnToDatatypePropertyDao();
 	ObjectPropertyDao objectPropertyDao = new ObjectPropertyDao();
 	ColumnToObjectPropertyDao columnToObjectPropertyDao = new ColumnToObjectPropertyDao();
+	ObjectPropertyDomainRangeDao objectPropertyDomainRangeDao = new ObjectPropertyDomainRangeDao();
 
 	/**
 	 * 
@@ -706,17 +709,16 @@ public class RdbToOntoBO {
 			columnToObjectProperty.setObjectProperty(objectProperty);
 			columnToObjectPropertyDao.saveOrUpdate(columnToObjectProperty);
 			
+			// Inserir na T022.
+			ObjectPropertyDomainRange objectPropertyDomainRange = new ObjectPropertyDomainRange();
+			objectPropertyDomainRange.setClassDomain(classDao.getByTable(column.getTable()));
 			
+			ColumnCheckValue columnCheckValue = columnCheckValueDao.getByColumn(column);
+			objectPropertyDomainRange.setClassRange(classDao.getByCheckSubject(columnCheckValue.getCheckValue().getCheckSubject()));
+			
+			objectPropertyDomainRange.setObjectProperty(objectProperty);
+			
+			objectPropertyDomainRangeDao.saveOrUpdate(objectPropertyDomainRange);
 		}
-		
-		/*Na T022 é inserido o ID da T019 na coluna C011_CLASS_ID_DOMAIN 
-		você deve inserir o ID da classe que esta tabela que esta coluna pertence
-		(Para obter esta informação da classe é preciso pegar o ID da tabela (C002_TABLE_ID) na T003_COLUMN
-		e verificar na T011_CLASS qual o ID desta Classe) 
-		e na Coluna C011_CLASS_ID_RANGE deve ser inserido (o ID da classe da T007 que representa este conceito.
-		Para encontrar o ID desse conceito você deve pegar o ID da C003_COLUMN_ID, ir até a T009_Column_Check_Value, 
-		ver um C006_CHECK_VALUE_ID que está relacionado a esta coluna 
-		e Finalmente, na T006_CHECK_VALUE, com esse C006_CHECK_VALUE_ID você encontra o C007_CHECK_SUBJECT_ID.
-		Com o C007_CHECK_SUBJECT_ID, na T011_CLASS é possível identificar o ID da classe gerada).*/
 	}
 }
