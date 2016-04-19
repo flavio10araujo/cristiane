@@ -17,6 +17,20 @@ public class ColumnDao extends GenericDao {
 		return (Column) criteria.list().get(0);
 	}
 	
+	public List<Column> getByIndColumnCheck(Long databaseId, boolean indColumnCheck) {
+		Criteria criteria = getSession().createCriteria(Column.class);
+		criteria.add(Restrictions.eq("indColumnCheck", indColumnCheck));
+		
+		@SuppressWarnings("unchecked")
+		List<Column> columns = criteria.list();
+		
+		if (columns == null || columns.size() == 0) {
+			return null;
+		}
+		
+		return filterColumnsByDatabase(databaseId, columns);
+	}
+	
 	public List<Column> getByIndDescriptionAndIndColumnCheck(Long databaseId, boolean indDescription, boolean indColumnCheck) {
 		Criteria criteria = getSession().createCriteria(Column.class);
 		criteria.add(Restrictions.eq("indDescription", indDescription));
@@ -29,6 +43,10 @@ public class ColumnDao extends GenericDao {
 			return null;
 		}
 		
+		return filterColumnsByDatabase(databaseId, columns);
+	}
+	
+	public List<Column> filterColumnsByDatabase(Long databaseId, List<Column> columns) {
 		List<Column> retorno = new ArrayList<Column>();
 		
 		for (Column column : columns) {

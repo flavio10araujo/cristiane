@@ -10,6 +10,7 @@ import br.ufpr.bean.CheckValue;
 import br.ufpr.bean.Column;
 import br.ufpr.bean.ColumnCheckValue;
 import br.ufpr.bean.ColumnToDatatypeProperty;
+import br.ufpr.bean.ColumnToObjectProperty;
 import br.ufpr.bean.Database;
 import br.ufpr.bean.DatabaseDomain;
 import br.ufpr.bean.DatatypeDb;
@@ -17,6 +18,7 @@ import br.ufpr.bean.DatatypeOnto;
 import br.ufpr.bean.DatatypeProperty;
 import br.ufpr.bean.Hierarchy;
 import br.ufpr.bean.Instance;
+import br.ufpr.bean.ObjectProperty;
 import br.ufpr.bean.Ontology;
 import br.ufpr.bean.Table;
 import br.ufpr.bean.TableDatabaseDomain;
@@ -26,6 +28,7 @@ import br.ufpr.dao.ClassDao;
 import br.ufpr.dao.ColumnCheckValueDao;
 import br.ufpr.dao.ColumnDao;
 import br.ufpr.dao.ColumnToDatatypePropertyDao;
+import br.ufpr.dao.ColumnToObjectPropertyDao;
 import br.ufpr.dao.DatabaseDao;
 import br.ufpr.dao.DatabaseDomainDao;
 import br.ufpr.dao.DatatypeDbDao;
@@ -33,6 +36,7 @@ import br.ufpr.dao.DatatypeOntoDao;
 import br.ufpr.dao.DatatypePropertyDao;
 import br.ufpr.dao.HierarchyDao;
 import br.ufpr.dao.InstanceDao;
+import br.ufpr.dao.ObjectPropertyDao;
 import br.ufpr.dao.OntologyDao;
 import br.ufpr.dao.TableDao;
 import br.ufpr.dao.TableDatabaseDomainDao;
@@ -57,6 +61,8 @@ public class RdbToOntoBO {
 	InstanceDao instanceDao = new InstanceDao();
 	DatatypePropertyDao datatypePropertyDao = new DatatypePropertyDao();
 	ColumnToDatatypePropertyDao columnToDatatypePropertyDao = new ColumnToDatatypePropertyDao();
+	ObjectPropertyDao objectPropertyDao = new ObjectPropertyDao();
+	ColumnToObjectPropertyDao columnToObjectPropertyDao = new ColumnToObjectPropertyDao();
 
 	/**
 	 * 
@@ -121,6 +127,15 @@ public class RdbToOntoBO {
 		try {
 			// Chama a função que importa os valores na T013.
 			importDatatypeProperty(database, ontology);
+		}
+		catch (Exception e1) {
+			e1.printStackTrace();
+			return null;
+		}
+		
+		try {
+			// Chama a função que importa os valores nas tabelas T019, T021 e T022.
+			importObjectProperty(database, ontology);
 		}
 		catch (Exception e1) {
 			e1.printStackTrace();
@@ -271,7 +286,7 @@ public class RdbToOntoBO {
 		Table table = tableDao.getByPhysicalName(database.getId(), fields[7]);
 
 		// table será null quando o sistema não encontrar a tabela com a qual a coluna importada é relacionada.
-		// Isso pode ocorrer quando a tabela for associativa, pois no momento essas tabelas n�o est�o sendo importadas.
+		// Isso pode ocorrer quando a tabela for associativa, pois no momento essas tabelas não estão sendo importadas.
 		if (table == null) {
 			return;
 		}
@@ -663,5 +678,45 @@ public class RdbToOntoBO {
 				columnToDatatypePropertyDao.saveOrUpdate(columnToDatatypeProperty);
 			}
 		}
+	}
+	
+	public void importObjectProperty(Database database, Ontology ontology) {
+		
+		// Buscar todas as colunas do database passado com C003_IND_COLUMN_CHECK = 1.
+		List<Column> columns = columnDao.getByIndColumnCheck(database.getId(), true);
+		
+		if (columns == null || columns.size() == 0) {
+			return;
+		}
+		
+		String description;
+		
+		for (Column column : columns) {
+			ObjectProperty objectProperty = new ObjectProperty();			
+			description = "Tem" + Util.funcaoMaiuscula(column.getLogicalName());
+			objectProperty.setDescription(description);
+			objectProperty.setOntology(ontology);
+			
+			// Inserir na T019.
+			objectPropertyDao.saveOrUpdate(objectProperty);
+			
+			// Inserir na T021.
+			ColumnToObjectProperty columnToObjectProperty = new ColumnToObjectProperty();
+			columnToObjectProperty.setColumn(column);
+			columnToObjectProperty.setObjectProperty(objectProperty);
+			columnToObjectPropertyDao.saveOrUpdate(columnToObjectProperty);
+			
+			
+		}
+		
+		/*Na T022 é inserido o ID da T019 na coluna C011_CLASS_ID_DOMAIN 
+		você deve inserir o ID da classe que esta tabela que esta coluna pertence
+		(Para obter esta informação da classe é preciso pegar o ID da tabela (C002_TABLE_ID) na T003_COLUMN
+		e verificar na T011_CLASS qual o ID desta Classe) 
+		e na Coluna C011_CLASS_ID_RANGE deve ser inserido (o ID da classe da T007 que representa este conceito.
+		Para encontrar o ID desse conceito você deve pegar o ID da C003_COLUMN_ID, ir até a T009_Column_Check_Value, 
+		ver um C006_CHECK_VALUE_ID que está relacionado a esta coluna 
+		e Finalmente, na T006_CHECK_VALUE, com esse C006_CHECK_VALUE_ID você encontra o C007_CHECK_SUBJECT_ID.
+		Com o C007_CHECK_SUBJECT_ID, na T011_CLASS é possível identificar o ID da classe gerada).*/
 	}
 }

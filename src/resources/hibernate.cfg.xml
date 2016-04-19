@@ -31,6 +31,8 @@
 		<mapping class="br.ufpr.bean.Hierarchy" />
 		<mapping class="br.ufpr.bean.Instance" />
 		<mapping class="br.ufpr.bean.ColumnToDatatypeProperty" />
+		<mapping class="br.ufpr.bean.ObjectProperty" />
+		<mapping class="br.ufpr.bean.ColumnToObjectProperty" />
 		<!-- Mapping -->
 	</session-factory>
 </hibernate-configuration>
