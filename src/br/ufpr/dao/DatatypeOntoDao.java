@@ -11,6 +11,12 @@ public class DatatypeOntoDao extends GenericDao {
 	public DatatypeOnto getByDatatypeDb(DatatypeDb datatypeDb) {
 		Criteria criteria = getSession().createCriteria(DatatypeOnto.class);
 		criteria.add(Restrictions.eq("datatypeDb", datatypeDb));
-		return (DatatypeOnto) criteria.list().get(0);
+		
+		try {
+			return (DatatypeOnto) criteria.list().get(0);
+		}
+		catch (Exception e) {
+			return null;
+		}
 	}
 }
