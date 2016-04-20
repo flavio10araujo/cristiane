@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Scanner;
 
+import com.sun.xml.internal.bind.v2.model.core.ID;
+
 import br.ufpr.bean.CheckSubject;
 import br.ufpr.bean.CheckValue;
 import br.ufpr.bean.Column;
@@ -16,6 +18,7 @@ import br.ufpr.bean.DatabaseDomain;
 import br.ufpr.bean.DatatypeDb;
 import br.ufpr.bean.DatatypeOnto;
 import br.ufpr.bean.DatatypeProperty;
+import br.ufpr.bean.DatatypePropertyDomainRange;
 import br.ufpr.bean.Hierarchy;
 import br.ufpr.bean.Instance;
 import br.ufpr.bean.ObjectProperty;
@@ -633,6 +636,13 @@ public class RdbToOntoBO {
 					columnToDatatypeProperty.setColumn(column);
 					columnToDatatypeProperty.setDatatypeProperty(datatypeProperty);
 					columnToDatatypePropertyDao.saveOrUpdate(columnToDatatypeProperty);
+					
+					// Inserir na T014.
+					DatatypePropertyDomainRange datatypePropertyDomainRange = new DatatypePropertyDomainRange();
+					datatypePropertyDomainRange.setDatatypeProperty(datatypeProperty);
+					datatypePropertyDomainRange.setClassDomain(classDao.getByTable(column.getTable()));
+					
+					continuar aqui
 				}
 				else {
 					// Inserir na T020.
@@ -679,6 +689,13 @@ public class RdbToOntoBO {
 				columnToDatatypeProperty.setColumn(column);
 				columnToDatatypeProperty.setDatatypeProperty(datatypeProperty);
 				columnToDatatypePropertyDao.saveOrUpdate(columnToDatatypeProperty);
+				
+				// Inserir na T014.
+				DatatypePropertyDomainRange datatypePropertyDomainRange = new DatatypePropertyDomainRange();
+				datatypePropertyDomainRange.setDatatypeProperty(datatypeProperty);
+				datatypePropertyDomainRange.setClassDomain(classDao.getByTable(column.getTable()));
+				
+				continuar aqui
 			}
 		}
 	}
