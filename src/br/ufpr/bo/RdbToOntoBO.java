@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Scanner;
 
-import com.sun.xml.internal.bind.v2.model.core.ID;
-
 import br.ufpr.bean.CheckSubject;
 import br.ufpr.bean.CheckValue;
 import br.ufpr.bean.Column;
@@ -18,7 +16,7 @@ import br.ufpr.bean.DatabaseDomain;
 import br.ufpr.bean.DatatypeDb;
 import br.ufpr.bean.DatatypeOnto;
 import br.ufpr.bean.DatatypeProperty;
-import br.ufpr.bean.DatatypePropertyDomainRange;
+import br.ufpr.bean.DatatypePropertyDomain;
 import br.ufpr.bean.Hierarchy;
 import br.ufpr.bean.Instance;
 import br.ufpr.bean.ObjectProperty;
@@ -38,6 +36,7 @@ import br.ufpr.dao.DatabaseDomainDao;
 import br.ufpr.dao.DatatypeDbDao;
 import br.ufpr.dao.DatatypeOntoDao;
 import br.ufpr.dao.DatatypePropertyDao;
+import br.ufpr.dao.DatatypePropertyDomainDao;
 import br.ufpr.dao.HierarchyDao;
 import br.ufpr.dao.InstanceDao;
 import br.ufpr.dao.ObjectPropertyDao;
@@ -69,6 +68,7 @@ public class RdbToOntoBO {
 	ObjectPropertyDao objectPropertyDao = new ObjectPropertyDao();
 	ColumnToObjectPropertyDao columnToObjectPropertyDao = new ColumnToObjectPropertyDao();
 	ObjectPropertyDomainRangeDao objectPropertyDomainRangeDao = new ObjectPropertyDomainRangeDao();
+	DatatypePropertyDomainDao datatypePropertyDomainDao = new DatatypePropertyDomainDao();
 
 	/**
 	 * 
@@ -230,7 +230,7 @@ public class RdbToOntoBO {
 
 			// Inserir as colunas.
 			// Se tem indAssociativeKey = 0 e IndColumnCheck = 0.
-			if ("C".equals(fields[0]) && "0".equals(fields[13]) && "0".equals(fields[18])) {
+			if ("C".equals(fields[0]) && "0".equals(fields[14]) && "0".equals(fields[19])) {
 				System.out.println(line);
 				importColumn(database, fields);
 			}
@@ -246,7 +246,7 @@ public class RdbToOntoBO {
 
 			// Inserir as colunas.
 			// Se tem indAssociativeKey = 1 e IndColumnCheck = 0.
-			if ("C".equals(fields[0]) && "1".equals(fields[13]) && "0".equals(fields[18])) {
+			if ("C".equals(fields[0]) && "1".equals(fields[14]) && "0".equals(fields[19])) {
 				System.out.println(line);
 				importColumn(database, fields);
 			}
@@ -262,7 +262,7 @@ public class RdbToOntoBO {
 
 			// Inserir as colunas.
 			// Se tem IndColumnCheck = 1.
-			if ("C".equals(fields[0]) && "1".equals(fields[18])) {
+			if ("C".equals(fields[0]) && "1".equals(fields[19])) {
 				System.out.println(line);
 				importColumn(database, fields);
 			}
@@ -323,49 +323,50 @@ public class RdbToOntoBO {
 		}
 
 		column.setPrimaryKey("1".equals(fields[9]) ? true : false);
-		column.setForeignKey("1".equals(fields[10]) ? true : false);
+		column.setUniqueKey("1".equals(fields[10]) ? true : false);
+		column.setForeignKey("1".equals(fields[11]) ? true : false);
 
-		Table fkTable = tableDao.getByPhysicalName(database.getId(), fields[11]);
+		Table fkTable = tableDao.getByPhysicalName(database.getId(), fields[12]);
 		column.setFkTable(fkTable);
 
-		column.setIndDescription("1".equals(fields[12]) ? true : false);
-		column.setIndAssociativeKey("1".equals(fields[13]) ? true : false);
+		column.setIndDescription("1".equals(fields[13]) ? true : false);
+		column.setIndAssociativeKey("1".equals(fields[14]) ? true : false);
 
-		Table akTableId1 = tableDao.getByPhysicalName(database.getId(), fields[14]);
+		Table akTableId1 = tableDao.getByPhysicalName(database.getId(), fields[15]);
 		column.setAkTableId1(akTableId1);
 
 		if (akTableId1 != null) {
-			Column akColumnId1 = columnDao.getByPhysicalName(akTableId1.getId(), fields[15]);
+			Column akColumnId1 = columnDao.getByPhysicalName(akTableId1.getId(), fields[16]);
 			column.setAkColumnId1(akColumnId1);
 		}
 
-		Table akTableIdN = tableDao.getByPhysicalName(database.getId(), fields[16]);
+		Table akTableIdN = tableDao.getByPhysicalName(database.getId(), fields[17]);
 		column.setAkTableIdN(akTableIdN);
 
 		if (akTableIdN != null) {
-			Column akColumnN = columnDao.getByPhysicalName(akTableIdN.getId(), fields[17]);
+			Column akColumnN = columnDao.getByPhysicalName(akTableIdN.getId(), fields[18]);
 			column.setAkColumnN(akColumnN);
 		}
 
-		column.setIndColumnCheck("1".equals(fields[18]) ? true : false);
+		column.setIndColumnCheck("1".equals(fields[19]) ? true : false);
 
 		// Salvando a coluna (T003).
 		columnDao.saveOrUpdate(column);
 
 		// Se informou o checkSubject.
-		if (!"".equals(fields[21])) {
-			CheckSubject checkSubject = checkSubjectDao.getByDescription(fields[21]);
+		if (!"".equals(fields[22])) {
+			CheckSubject checkSubject = checkSubjectDao.getByDescription(fields[22]);
 
 			// Se não encontrou o checkSubject no banco, deve cadastrá-lo. 
 			if (checkSubject == null) {
 				checkSubject = new CheckSubject();
-				checkSubject.setDescription(fields[21].toLowerCase());
+				checkSubject.setDescription(fields[22].toLowerCase());
 				// Inserindo na T007.
 				checkSubjectDao.saveOrUpdate(checkSubject);
 			}
 
-			String[] checkValues = fields[19].split(",", -1);
-			String[] checkAbreviations = fields[20].split(",", -1);
+			String[] checkValues = fields[20].split(",", -1);
+			String[] checkAbreviations = fields[21].split(",", -1);
 
 			for (int j = 0; j < checkValues.length; j++) {
 
@@ -427,7 +428,7 @@ public class RdbToOntoBO {
 	/**
 	 * Busca todos os registros da T008 relacionados a determinado banco de dados.
 	 * Para cada um dos registros encontrados, insere um registro na T011.
-	 * Al�m disso, insere um registro na T012 relacionando o registro rec�m-inserido na T011 e a Thing.
+	 * Além disso, insere um registro na T012 relacionando o registro recém-inserido na T011 e a Thing.
 	 * 
 	 * @param database
 	 * @param clazz
@@ -462,7 +463,7 @@ public class RdbToOntoBO {
 	/**
 	 * Busca todos os registros da T002 relacionados a determinado banco de dados.
 	 * Para cada um dos registros encontrados, insere um registro na T011.
-	 * Al�m disso, insere um registro na T012 relacionando o registro rec�m-inserido na T011 e a Thing.
+	 * Além disso, insere um registro na T012 relacionando o registro recém-inserido na T011 e a Thing.
 	 * 
 	 * @param database
 	 * @param clazz
@@ -638,11 +639,11 @@ public class RdbToOntoBO {
 					columnToDatatypePropertyDao.saveOrUpdate(columnToDatatypeProperty);
 					
 					// Inserir na T014.
-					DatatypePropertyDomainRange datatypePropertyDomainRange = new DatatypePropertyDomainRange();
-					datatypePropertyDomainRange.setDatatypeProperty(datatypeProperty);
-					datatypePropertyDomainRange.setClassDomain(classDao.getByTable(column.getTable()));
-					
-					continuar aqui
+					DatatypePropertyDomain datatypePropertyDomain = new DatatypePropertyDomain();
+					datatypePropertyDomain.setDatatypeProperty(datatypeProperty);
+					datatypePropertyDomain.setClassDomain(classDao.getByTable(column.getTable()));
+					datatypePropertyDomain.setDatatypeSubpropertyOf(false);
+					datatypePropertyDomainDao.saveOrUpdate(datatypePropertyDomain);
 				}
 				else {
 					// Inserir na T020.
@@ -691,11 +692,11 @@ public class RdbToOntoBO {
 				columnToDatatypePropertyDao.saveOrUpdate(columnToDatatypeProperty);
 				
 				// Inserir na T014.
-				DatatypePropertyDomainRange datatypePropertyDomainRange = new DatatypePropertyDomainRange();
-				datatypePropertyDomainRange.setDatatypeProperty(datatypeProperty);
-				datatypePropertyDomainRange.setClassDomain(classDao.getByTable(column.getTable()));
-				
-				continuar aqui
+				DatatypePropertyDomain datatypePropertyDomain = new DatatypePropertyDomain();
+				datatypePropertyDomain.setDatatypeProperty(datatypeProperty);
+				datatypePropertyDomain.setClassDomain(classDao.getByTable(column.getTable()));
+				datatypePropertyDomain.setDatatypeSubpropertyOf(false);
+				datatypePropertyDomainDao.saveOrUpdate(datatypePropertyDomain);
 			}
 		}
 	}

@@ -38,6 +38,9 @@ public class Column implements Serializable {
 
 	@javax.persistence.Column(name = "c003_ind_foreign_key", nullable = false)
 	private boolean foreignKey;
+	
+	@javax.persistence.Column(name = "c003_ind_unique_key", nullable = false)
+	private boolean uniqueKey;
 
 	@ManyToOne
 	@JoinColumn(name = "c002_fk_table_id")
@@ -196,5 +199,13 @@ public class Column implements Serializable {
 
 	public void setAkTableIdN(Table akTableIdN) {
 		this.akTableIdN = akTableIdN;
+	}
+
+	public boolean isUniqueKey() {
+		return uniqueKey;
+	}
+
+	public void setUniqueKey(boolean uniqueKey) {
+		this.uniqueKey = uniqueKey;
 	}
 }

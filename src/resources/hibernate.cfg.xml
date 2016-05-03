@@ -34,6 +34,7 @@
 		<mapping class="br.ufpr.bean.ObjectProperty" />
 		<mapping class="br.ufpr.bean.ColumnToObjectProperty" />
 		<mapping class="br.ufpr.bean.ObjectPropertyDomainRange" />
+		<mapping class="br.ufpr.bean.DatatypePropertyDomain" />
 		<!-- Mapping -->
 	</session-factory>
 </hibernate-configuration>
