@@ -17,9 +17,22 @@ public class ColumnDao extends GenericDao {
 		return (Column) criteria.list().get(0);
 	}
 	
-	public List<Column> getByIndColumnCheck(Long databaseId, boolean indColumnCheck) {
+	/**
+	 * 
+	 * 
+	 * @param databaseId
+	 * @param indColumnCheck
+	 * @param indPrimaryKey
+	 * @param indForeignKey
+	 * @param indUniqueKey
+	 * @return
+	 */
+	public List<Column> getByIndsColumncheckPrimarykeyForeignkeyUniquekey(Long databaseId, boolean indColumnCheck, boolean indPrimaryKey, boolean indForeignKey, boolean indUniqueKey) {
 		Criteria criteria = getSession().createCriteria(Column.class);
 		criteria.add(Restrictions.eq("indColumnCheck", indColumnCheck));
+		criteria.add(Restrictions.eq("primaryKey", indPrimaryKey));
+		criteria.add(Restrictions.eq("foreignKey", indForeignKey));
+		criteria.add(Restrictions.eq("uniqueKey", indUniqueKey));
 		
 		@SuppressWarnings("unchecked")
 		List<Column> columns = criteria.list();

@@ -178,8 +178,8 @@ public class RdbToOntoBO {
 
 			String[] fields = line.split(";", -1);
 
-			// Inserir as tabelas que não são associativas.
-			if (fields[0].equals("T") && fields[6].equals("0")) {
+			// Inserir as tabelas.
+			if (fields[0].equals("T")) {
 				System.out.println(line);
 
 				Table table = new Table();
@@ -191,23 +191,26 @@ public class RdbToOntoBO {
 
 				// Cadastrando na T002.
 				tableDao.saveOrUpdate(table);
-
-				DatabaseDomain databaseDomain = databaseDomainDao.getByDescription(database, fields[5]);
-
-				// Se não encontrou o databaseDomain (T008) no banco, deve cadastrá-lo.
-				if (databaseDomain == null) {
-					databaseDomain = new DatabaseDomain();
-					databaseDomain.setDatabase(database);
-					databaseDomain.setDescription(fields[5].toLowerCase());
-					databaseDomainDao.saveOrUpdate(databaseDomain);
+				
+				// Apenas para tabelas não-associativas.
+				if (fields[6].equals("0")) {
+					DatabaseDomain databaseDomain = databaseDomainDao.getByDescription(database, fields[5]);
+	
+					// Se não encontrou o databaseDomain (T008) no banco, deve cadastrá-lo.
+					if (databaseDomain == null) {
+						databaseDomain = new DatabaseDomain();
+						databaseDomain.setDatabase(database);
+						databaseDomain.setDescription(fields[5].toLowerCase());
+						databaseDomainDao.saveOrUpdate(databaseDomain);
+					}
+	
+					TableDatabaseDomain tableDatabaseDomain = new TableDatabaseDomain();
+					tableDatabaseDomain.setTable(table);
+					tableDatabaseDomain.setDatabaseDomain(databaseDomain);
+	
+					// Cadastrando o relacionamento na T010.
+					tableDatabaseDomainDao.saveOrUpdate(tableDatabaseDomain);
 				}
-
-				TableDatabaseDomain tableDatabaseDomain = new TableDatabaseDomain();
-				tableDatabaseDomain.setTable(table);
-				tableDatabaseDomain.setDatabaseDomain(databaseDomain);
-
-				// Cadastrando o relacionamento na T010.
-				tableDatabaseDomainDao.saveOrUpdate(tableDatabaseDomain);
 			}
 		}
 
@@ -479,6 +482,11 @@ public class RdbToOntoBO {
 		String name;
 
 		for (Table table : lista) {
+			
+			if (table.isAssociative()) {
+				continue;
+			}
+			
 			br.ufpr.bean.Class c = new br.ufpr.bean.Class();
 			c.setTable(table);
 			name = Util.funcaoMaiuscula(table.getLogicalName());
@@ -614,6 +622,17 @@ public class RdbToOntoBO {
 		String description;
 
 		for (Column column : columns) {
+			
+			// PASSO 26
+			if (column.getTable().isAssociative()) {
+				continue;
+			}
+			
+			// PASSO 26
+			if (column.isPrimaryKey() || column.isForeignKey() || column.isUniqueKey()) {
+				continue;
+			}
+			
 			DatatypeProperty datatypeProperty = new DatatypeProperty();			
 			description = "a" + Util.funcaoMaiuscula(column.getLogicalName());
 			datatypeProperty.setDescription(description);
@@ -672,6 +691,17 @@ public class RdbToOntoBO {
 		String description;
 
 		for (Column column : columns) {
+			
+			// PASSO 26
+			if (column.getTable().isAssociative()) {
+				continue;
+			}
+			
+			// PASSO 26
+			if (column.isPrimaryKey() || column.isForeignKey() || column.isUniqueKey()) {
+				continue;
+			}
+			
 			DatatypeProperty datatypeProperty = new DatatypeProperty();			
 			description = "a" + Util.funcaoMaiuscula(column.getLogicalName());
 			datatypeProperty.setDescription(description);
@@ -703,8 +733,24 @@ public class RdbToOntoBO {
 	
 	public void importObjectProperty(Database database, Ontology ontology) {
 		
-		// Buscar todas as colunas do database passado com C003_IND_COLUMN_CHECK = 1.
-		List<Column> columns = columnDao.getByIndColumnCheck(database.getId(), true);
+		// Colunas com C003_IND_COLUMN_CHECK = 0 AND C003_IND_PRIMARY_KEY = 0 AND C003_IND_FOREIGN_KEY = 0 AND C003_IND_UNIQUE_KEY = 1 (PASSO 18.1)
+		importObjectProperty01(database, ontology);
+
+		// Colunas com C003_IND_COLUMN_CHECK = 0 AND C003_IND_PRIMARY_KEY = 1 AND C003_IND_FOREIGN_KEY = 0 AND C003_IND_UNIQUE_KEY = 0 (PASSO 18.2)
+		importObjectProperty02(database, ontology);
+		
+		// Colunas com C003_IND_COLUMN_CHECK = 1 AND C003_IND_PRIMARY_KEY = 0 AND C003_IND_FOREIGN_KEY = 0 AND C003_IND_UNIQUE_KEY = 0. (PASSO 22)
+		importObjectProperty03(database, ontology);
+	}
+	
+	/**
+	 * 
+	 * @param database
+	 * @param ontology
+	 */
+	public void importObjectProperty01(Database database, Ontology ontology) {
+		// Colunas com C003_IND_COLUMN_CHECK = 0 AND C003_IND_PRIMARY_KEY = 0 AND C003_IND_FOREIGN_KEY = 0 AND C003_IND_UNIQUE_KEY = 1
+		List<Column> columns = columnDao.getByIndsColumncheckPrimarykeyForeignkeyUniquekey(database.getId(), false, false, false, true);
 		
 		if (columns == null || columns.size() == 0) {
 			return;
@@ -713,6 +759,125 @@ public class RdbToOntoBO {
 		String description;
 		
 		for (Column column : columns) {
+			
+			// PASSO 26
+			if (column.getTable().isAssociative()) {
+				continue;
+			}
+			
+			// PASSO 26
+			if (column.isPrimaryKey() || column.isForeignKey() || column.isUniqueKey()) {
+				continue;
+			}
+			
+			ObjectProperty objectProperty = new ObjectProperty();			
+			description = "UK" + Util.funcaoMaiuscula(column.getLogicalName());
+			objectProperty.setDescription(description);
+			objectProperty.setOntology(ontology);
+			
+			// Inserir na T019.
+			objectPropertyDao.saveOrUpdate(objectProperty);
+			
+			// Inserir na T021.
+			ColumnToObjectProperty columnToObjectProperty = new ColumnToObjectProperty();
+			columnToObjectProperty.setColumn(column);
+			columnToObjectProperty.setObjectProperty(objectProperty);
+			columnToObjectPropertyDao.saveOrUpdate(columnToObjectProperty);
+			
+			// Inserir na T022.
+			ObjectPropertyDomainRange objectPropertyDomainRange = new ObjectPropertyDomainRange();
+			objectPropertyDomainRange.setClassDomain(classDao.getByTable(column.getTable()));
+			
+			ColumnCheckValue columnCheckValue = columnCheckValueDao.getByColumn(column);
+			objectPropertyDomainRange.setClassRange(classDao.getByCheckSubject(columnCheckValue.getCheckValue().getCheckSubject()));
+			
+			objectPropertyDomainRange.setObjectProperty(objectProperty);
+			
+			objectPropertyDomainRangeDao.saveOrUpdate(objectPropertyDomainRange);
+		}
+	}
+	
+	/**
+	 * 
+	 * @param database
+	 * @param ontology
+	 */
+	public void importObjectProperty02(Database database, Ontology ontology) {
+		// Colunas com C003_IND_COLUMN_CHECK = 0 AND C003_IND_PRIMARY_KEY = 1 AND C003_IND_FOREIGN_KEY = 0 AND C003_IND_UNIQUE_KEY = 0
+		List<Column> columns = columnDao.getByIndsColumncheckPrimarykeyForeignkeyUniquekey(database.getId(), false, false, false, true);
+		
+		if (columns == null || columns.size() == 0) {
+			return;
+		}
+		
+		String description;
+		
+		for (Column column : columns) {
+			
+			// PASSO 26
+			if (column.getTable().isAssociative()) {
+				continue;
+			}
+			
+			// PASSO 26
+			if (column.isPrimaryKey() || column.isForeignKey() || column.isUniqueKey()) {
+				continue;
+			}
+			
+			ObjectProperty objectProperty = new ObjectProperty();			
+			description = "PK" + Util.funcaoMaiuscula(column.getLogicalName());
+			objectProperty.setDescription(description);
+			objectProperty.setOntology(ontology);
+			
+			// Inserir na T019.
+			objectPropertyDao.saveOrUpdate(objectProperty);
+			
+			// Inserir na T021.
+			ColumnToObjectProperty columnToObjectProperty = new ColumnToObjectProperty();
+			columnToObjectProperty.setColumn(column);
+			columnToObjectProperty.setObjectProperty(objectProperty);
+			columnToObjectPropertyDao.saveOrUpdate(columnToObjectProperty);
+			
+			// Inserir na T022.
+			ObjectPropertyDomainRange objectPropertyDomainRange = new ObjectPropertyDomainRange();
+			objectPropertyDomainRange.setClassDomain(classDao.getByTable(column.getTable()));
+			
+			ColumnCheckValue columnCheckValue = columnCheckValueDao.getByColumn(column);
+			objectPropertyDomainRange.setClassRange(classDao.getByCheckSubject(columnCheckValue.getCheckValue().getCheckSubject()));
+			
+			objectPropertyDomainRange.setObjectProperty(objectProperty);
+			
+			objectPropertyDomainRangeDao.saveOrUpdate(objectPropertyDomainRange);
+		}
+	}
+	
+	/**
+	 * 
+	 * @param database
+	 * @param ontology
+	 */
+	public void importObjectProperty03(Database database, Ontology ontology) {
+		// Colunas com C003_IND_COLUMN_CHECK = 1 AND C003_IND_PRIMARY_KEY = 0 AND C003_IND_FOREIGN_KEY = 0 AND C003_IND_UNIQUE_KEY = 0.
+		List<Column> columns = columnDao.getByIndsColumncheckPrimarykeyForeignkeyUniquekey(database.getId(), true, false, false, false);
+		
+		if (columns == null || columns.size() == 0) {
+			return;
+		}
+		
+		String description;
+		
+		for (Column column : columns) {
+			
+			// PASSO 26
+			if (column.getTable().isAssociative()) {
+				continue;
+			}
+			
+			// PASSO 26
+			if (column.isPrimaryKey() || column.isForeignKey() || column.isUniqueKey()) {
+				continue;
+			}
+			
 			ObjectProperty objectProperty = new ObjectProperty();			
 			description = "Tem" + Util.funcaoMaiuscula(column.getLogicalName());
 			objectProperty.setDescription(description);
