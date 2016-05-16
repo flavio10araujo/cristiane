@@ -33,6 +33,12 @@ public class DatatypeProperty implements Serializable {
 	@JoinColumn(name = "c018_datatype_id")
 	private DatatypeOnto datatypeOnto;
 	
+	@Column(name = "c013_ind_common_concept")
+	private Boolean indCommonConcept;
+	
+	@Column(name = "c013_ind_description")
+	private Boolean indDescription;
+	
 	public Long getId() {
 		return id;
 	}
@@ -63,5 +69,21 @@ public class DatatypeProperty implements Serializable {
 
 	public void setDatatypeOnto(DatatypeOnto datatypeOnto) {
 		this.datatypeOnto = datatypeOnto;
+	}
+
+	public Boolean getIndCommonConcept() {
+		return indCommonConcept;
+	}
+
+	public void setIndCommonConcept(Boolean indCommonConcept) {
+		this.indCommonConcept = indCommonConcept;
+	}
+
+	public Boolean getIndDescription() {
+		return indDescription;
+	}
+
+	public void setIndDescription(Boolean indDescription) {
+		this.indDescription = indDescription;
 	}
 }

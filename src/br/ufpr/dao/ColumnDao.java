@@ -71,4 +71,18 @@ public class ColumnDao extends GenericDao {
 		
 		return retorno;
 	}
+	
+	public List<Column> getByIndPrimarykey(Long databaseId, boolean indPrimaryKey) {
+		Criteria criteria = getSession().createCriteria(Column.class);
+		criteria.add(Restrictions.eq("primaryKey", indPrimaryKey));
+		
+		@SuppressWarnings("unchecked")
+		List<Column> columns = criteria.list();
+		
+		if (columns == null || columns.size() == 0) {
+			return null;
+		}
+		
+		return filterColumnsByDatabase(databaseId, columns);
+	}
 }

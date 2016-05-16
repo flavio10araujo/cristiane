@@ -83,11 +83,11 @@ public class RdbToOntoBO {
 		database.setName(form.getDatabaseName().toLowerCase());
 
 		// Salvando o nome do banco de dados na T001.
-		databaseDao.saveOrUpdate(database);
+		databaseDao.saveOrUpdate(database); // PASSO 2
 
 		try {
 			// Chama a função que importa a primeira ontologia na T016.
-			ontology = importOntology(database);
+			ontology = importOntology(database); // PASSO 3.0
 		}
 		catch (Exception e1) {
 			e1.printStackTrace();
@@ -96,7 +96,7 @@ public class RdbToOntoBO {
 
 		try {
 			// Chama a função que importa as tabelas na T002.
-			importTables(form, database);
+			importTables(form, database); // PASSO 4
 		}
 		catch (Exception e1) {
 			e1.printStackTrace();
@@ -105,7 +105,7 @@ public class RdbToOntoBO {
 
 		try {
 			// Chama a função que importa as colunas na T003.
-			importColumns(form, database);
+			importColumns(form, database); // PASSO 7
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -114,7 +114,7 @@ public class RdbToOntoBO {
 
 		try {
 			// Chama a função que importa os valores na T011.
-			importClass(database, ontology);
+			importClass(database, ontology); // PASSO 3.2, PASSO 3.5, PASSO 6.1?, PASSO 17.1
 		}
 		catch (Exception e1) {
 			e1.printStackTrace();
@@ -123,7 +123,7 @@ public class RdbToOntoBO {
 
 		try {
 			// Chama a função que importa os valores na T015.
-			importInstance();
+			importInstance(); // PASSO 17.2
 		}
 		catch (Exception e1) {
 			e1.printStackTrace();
@@ -132,7 +132,7 @@ public class RdbToOntoBO {
 
 		try {
 			// Chama a função que importa os valores na T013.
-			importDatatypeProperty(database, ontology);
+			importDatatypeProperty(database, ontology); // PASSO 18, PASSO 19
 		}
 		catch (Exception e1) {
 			e1.printStackTrace();
@@ -141,7 +141,7 @@ public class RdbToOntoBO {
 		
 		try {
 			// Chama a função que importa os valores nas tabelas T019, T021 e T022.
-			importObjectProperty(database, ontology);
+			importObjectProperty(database, ontology); // PASSO 18.1, PASSO 18.2, PASSO 22
 		}
 		catch (Exception e1) {
 			e1.printStackTrace();
@@ -159,7 +159,7 @@ public class RdbToOntoBO {
 		Ontology ontology = new Ontology();
 		ontology.setName(database.getName());
 		ontology.setDatabase(database);
-		ontologyDao.saveOrUpdate(ontology);
+		ontologyDao.saveOrUpdate(ontology); // PASSO 3.0
 		return ontology;
 	}
 
@@ -190,7 +190,7 @@ public class RdbToOntoBO {
 				table.setAssociative("1".equals(fields[6]) ? true : false);
 
 				// Cadastrando na T002.
-				tableDao.saveOrUpdate(table);
+				tableDao.saveOrUpdate(table); // PASSO 5
 				
 				// Apenas para tabelas não-associativas.
 				if (fields[6].equals("0")) {
@@ -232,7 +232,7 @@ public class RdbToOntoBO {
 			String[] fields = line.split(";", -1);
 
 			// Inserir as colunas.
-			// Se tem indAssociativeKey = 0 e IndColumnCheck = 0.
+			// Se tem indAssociativeKey = 0 e IndColumnCheck = 0. // PASSO 9
 			if ("C".equals(fields[0]) && "0".equals(fields[14]) && "0".equals(fields[19])) {
 				System.out.println(line);
 				importColumn(database, fields);
@@ -248,7 +248,7 @@ public class RdbToOntoBO {
 			String[] fields = line.split(";", -1);
 
 			// Inserir as colunas.
-			// Se tem indAssociativeKey = 1 e IndColumnCheck = 0.
+			// Se tem indAssociativeKey = 1 e IndColumnCheck = 0. // PASSO 14
 			if ("C".equals(fields[0]) && "1".equals(fields[14]) && "0".equals(fields[19])) {
 				System.out.println(line);
 				importColumn(database, fields);
@@ -264,7 +264,7 @@ public class RdbToOntoBO {
 			String[] fields = line.split(";", -1);
 
 			// Inserir as colunas.
-			// Se tem IndColumnCheck = 1.
+			// Se tem IndColumnCheck = 1. // PASSO 16
 			if ("C".equals(fields[0]) && "1".equals(fields[19])) {
 				System.out.println(line);
 				importColumn(database, fields);
@@ -292,7 +292,7 @@ public class RdbToOntoBO {
 
 		column.setLogicalName2(fields[3]);
 
-		Table table = tableDao.getByPhysicalName(database.getId(), fields[7]);
+		Table table = tableDao.getByPhysicalName(database.getId(), fields[7]); // PASSO 10
 
 		// table será null quando o sistema não encontrar a tabela com a qual a coluna importada é relacionada.
 		// Isso pode ocorrer quando a tabela for associativa, pois no momento essas tabelas não estão sendo importadas.
@@ -304,7 +304,7 @@ public class RdbToOntoBO {
 
 		// Se informou o datatype.
 		if (!"".equals(fields[8])) {
-			DatatypeDb datatypeDb = datatypeDbDao.getByDescription(fields[8]);
+			DatatypeDb datatypeDb = datatypeDbDao.getByDescription(fields[8]); // PASSO 11
 
 			// Se encontrou o datatype no banco.
 			if (datatypeDb != null) {
@@ -314,29 +314,29 @@ public class RdbToOntoBO {
 				// Deve cadastrar o datatype (T005).
 				datatypeDb = new DatatypeDb();
 				datatypeDb.setDescription(fields[8].toLowerCase());
-				datatypeDbDao.saveOrUpdate(datatypeDb);
+				datatypeDbDao.saveOrUpdate(datatypeDb); // PASSO 11
 				column.setDatatypeDb(datatypeDb);
 
 				// Clonar o datatype na T018.
 				DatatypeOnto datatypeOnto = new DatatypeOnto();
 				datatypeOnto.setDescription(datatypeDb.getDescription());
 				datatypeOnto.setDatatypeDb(datatypeDb);
-				datatypeOntoDao.saveOrUpdate(datatypeOnto);
+				datatypeOntoDao.saveOrUpdate(datatypeOnto); // PASSO 11.1
 			}
 		}
 
 		column.setPrimaryKey("1".equals(fields[9]) ? true : false);
-		column.setUniqueKey("1".equals(fields[10]) ? true : false);
+		column.setUniqueKey("1".equals(fields[10]) ? true : false); // PASSO 12.1
 		column.setForeignKey("1".equals(fields[11]) ? true : false);
 
 		Table fkTable = tableDao.getByPhysicalName(database.getId(), fields[12]);
-		column.setFkTable(fkTable);
+		column.setFkTable(fkTable); // PASSO 13
 
 		column.setIndDescription("1".equals(fields[13]) ? true : false);
 		column.setIndAssociativeKey("1".equals(fields[14]) ? true : false);
 
 		Table akTableId1 = tableDao.getByPhysicalName(database.getId(), fields[15]);
-		column.setAkTableId1(akTableId1);
+		column.setAkTableId1(akTableId1); // PASSO 15
 
 		if (akTableId1 != null) {
 			Column akColumnId1 = columnDao.getByPhysicalName(akTableId1.getId(), fields[16]);
@@ -354,9 +354,9 @@ public class RdbToOntoBO {
 		column.setIndColumnCheck("1".equals(fields[19]) ? true : false);
 
 		// Salvando a coluna (T003).
-		columnDao.saveOrUpdate(column);
+		columnDao.saveOrUpdate(column); // PASSO 12
 
-		// Se informou o checkSubject.
+		// Se informou o checkSubject. // PASSO 17
 		if (!"".equals(fields[22])) {
 			CheckSubject checkSubject = checkSubjectDao.getByDescription(fields[22]);
 
@@ -365,7 +365,7 @@ public class RdbToOntoBO {
 				checkSubject = new CheckSubject();
 				checkSubject.setDescription(fields[22].toLowerCase());
 				// Inserindo na T007.
-				checkSubjectDao.saveOrUpdate(checkSubject);
+				checkSubjectDao.saveOrUpdate(checkSubject); // PASSO 17
 			}
 
 			String[] checkValues = fields[20].split(",", -1);
@@ -374,23 +374,23 @@ public class RdbToOntoBO {
 			for (int j = 0; j < checkValues.length; j++) {
 
 				// Verificar se um checkValue com essa description + abreviation já existe na T006.
-				CheckValue checkValueAux = checkValueDao.getByDescriptionAndAbreviation(checkValues[j], checkAbreviations[j]);
+				CheckValue checkValue = checkValueDao.getByDescriptionAndAbreviation(checkValues[j], checkAbreviations[j]);
 
 				// Se não existir, deve ser cadastrado.
-				if (checkValueAux == null) {
-					CheckValue checkValue = new CheckValue();
-					checkValue.setDescription(checkValues[j]);
+				if (checkValue == null) {
+					checkValue = new CheckValue();
+					checkValue.setDescription(checkValues[j].trim());
 					checkValue.setAbreviation(checkAbreviations[j]);
 					checkValue.setCheckSubject(checkSubject);
 					// Inserindo na T006.
 					checkValueDao.saveOrUpdate(checkValue);
-
-					// Inserindo na T009.
-					ColumnCheckValue columnCheckValue = new ColumnCheckValue();
-					columnCheckValue.setColumn(column);
-					columnCheckValue.setCheckValue(checkValue);
-					columnCheckValueDao.saveOrUpdate(columnCheckValue);
 				}
+				
+				// Inserindo na T009.
+				ColumnCheckValue columnCheckValue = new ColumnCheckValue();
+				columnCheckValue.setColumn(column);
+				columnCheckValue.setCheckValue(checkValue);
+				columnCheckValueDao.saveOrUpdate(columnCheckValue); // PASSO 17
 			}
 		}
 	}
@@ -403,16 +403,16 @@ public class RdbToOntoBO {
 	 */
 	public void importClass(Database database, Ontology ontology) {
 		// Chama a função que importa a class Thing na T011.
-		br.ufpr.bean.Class clazz = importClassThing(ontology);
+		br.ufpr.bean.Class clazz = importClassThing(ontology); // PASSO 3.2
 
 		// Chama a função que importa os valores de database domain (T008) na T011.
-		importClassDatabaseDomain(database, clazz, ontology);
+		importClassDatabaseDomain(database, clazz, ontology); // PASSO 3.5, PASSO 3.5a, PASSO 3.6
 
 		// Chama a função que importa os valores de tables (T002) na T011.
-		importClassTable(database, clazz, ontology);
+		importClassTable(database, clazz, ontology); // PASSO 6.1?, PASSO 6.1a, PASSO 6.1b
 
 		// Chama a função que importa os valores de check subject (T007) na T011.
-		importClassCheckSubject(database, clazz, ontology);
+		importClassCheckSubject(database, clazz, ontology); // PASSO 17.1
 	}
 
 	/**
@@ -424,7 +424,7 @@ public class RdbToOntoBO {
 		br.ufpr.bean.Class c = new br.ufpr.bean.Class();
 		c.setName("Thing");
 		c.setOntology(ontology);
-		classDao.saveOrUpdate(c);
+		classDao.saveOrUpdate(c); // PASSO 3.2
 		return c;
 	}
 
@@ -450,16 +450,16 @@ public class RdbToOntoBO {
 			br.ufpr.bean.Class c = new br.ufpr.bean.Class();
 			c.setDatabaseDomain(databaseDomain);
 			name = Util.funcaoMaiuscula(databaseDomain.getDescription());
-			name = "g" + name;
+			name = "g" + name; // PASSO 3.5a
 			c.setName(name);
 			c.setOntology(ontology);
-			classDao.saveOrUpdate(c);
+			classDao.saveOrUpdate(c); // PASSO 3.5
 
 			Hierarchy hierarchy = new Hierarchy();
 			hierarchy.setSuperClass(clazz);
 			hierarchy.setSubClass(c);
 
-			hierarchyDao.saveOrUpdate(hierarchy);
+			hierarchyDao.saveOrUpdate(hierarchy); // PASSO 3.6
 		}
 	}
 
@@ -492,19 +492,19 @@ public class RdbToOntoBO {
 			name = Util.funcaoMaiuscula(table.getLogicalName());
 
 			if (name == null || "".equals(name)) {
-				name = Util.funcaoMaiuscula(table.getPhysicalName());
+				name = Util.funcaoMaiuscula(table.getPhysicalName()); // PASSO 6.1a
 			}
 
-			name = "e" + name;
+			name = "e" + name; // PASSO 6.1b
 			c.setName(name);
 			c.setOntology(ontology);
-			classDao.saveOrUpdate(c);
+			classDao.saveOrUpdate(c); // PASSO 6.1
 
 			Hierarchy hierarchy = new Hierarchy();
 			hierarchy.setSuperClass(clazz);
 			hierarchy.setSubClass(c);
 
-			hierarchyDao.saveOrUpdate(hierarchy);
+			hierarchyDao.saveOrUpdate(hierarchy); // PASSO 6.2
 		}
 	}
 
@@ -540,7 +540,7 @@ public class RdbToOntoBO {
 				name = "v" + name;
 				c.setName(name);
 				c.setOntology(ontology);
-				classDao.saveOrUpdate(c);
+				classDao.saveOrUpdate(c); // PASSO 17.1
 
 				Hierarchy hierarchy = new Hierarchy();
 				hierarchy.setSuperClass(clazz);
@@ -589,7 +589,7 @@ public class RdbToOntoBO {
 
 					newIntance.setClazz(clazz);
 					newIntance.setOntology(clazz.getOntology());
-					instanceDao.saveOrUpdate(newIntance);
+					instanceDao.saveOrUpdate(newIntance); // PASSO 17.2
 				}
 			}
 		}
@@ -599,11 +599,11 @@ public class RdbToOntoBO {
 	 * 
 	 */
 	public void importDatatypeProperty(Database database, Ontology ontology) {
-		// Colunas com C003_IND_DESCRIPTION = 1 e C003_IND_COLUMN_CHECK = 0.
-		importDatatypeProperty01(database, ontology);
+		// Colunas com C003_IND_DESCRIPTION = 1 AND C003_IND_COLUMN_CHECK = 0.
+		importDatatypeProperty01(database, ontology); // PASSO 19
 
-		// Colunas com C003_IND_DESCRIPTION = 0 e C003_IND_COLUMN_CHECK = 0.
-		importDatatypeProperty02(database, ontology);
+		// Colunas com C003_IND_DESCRIPTION = 0 AND C003_IND_COLUMN_CHECK = 0.
+		importDatatypeProperty02(database, ontology); // PASSO 20
 	}
 
 	/**
@@ -612,7 +612,7 @@ public class RdbToOntoBO {
 	 * @param ontology
 	 */
 	public void importDatatypeProperty01(Database database, Ontology ontology) {
-		// Buscar todas as colunas do database passado com C003_IND_DESCRIPTION = 1 e C003_IND_COLUMN_CHECK = 0.
+		// Buscar todas as colunas do database passado com C003_IND_DESCRIPTION = 1 AND C003_IND_COLUMN_CHECK = 0.
 		List<Column> columns = columnDao.getByIndDescriptionAndIndColumnCheck(database.getId(), true, false);  
 
 		if (columns == null || columns.size() == 0) {
@@ -637,6 +637,7 @@ public class RdbToOntoBO {
 			description = "a" + Util.funcaoMaiuscula(column.getLogicalName());
 			datatypeProperty.setDescription(description);
 			datatypeProperty.setOntology(ontology);
+			datatypeProperty.setIndDescription(true); // PASSO 19.1
 
 			DatatypeOnto datatypeOnto = datatypeOntoDao.getByDatatypeDb(column.getDatatypeDb());
 
@@ -649,28 +650,21 @@ public class RdbToOntoBO {
 
 				if (datatypePropertyExistente == null) {
 					// Inserir na T013.
-					datatypePropertyDao.saveOrUpdate(datatypeProperty);
+					datatypePropertyDao.saveOrUpdate(datatypeProperty); // PASSO 19
+				}
 
-					// Inserir na T020.
-					ColumnToDatatypeProperty columnToDatatypeProperty = new ColumnToDatatypeProperty();
-					columnToDatatypeProperty.setColumn(column);
-					columnToDatatypeProperty.setDatatypeProperty(datatypeProperty);
-					columnToDatatypePropertyDao.saveOrUpdate(columnToDatatypeProperty);
-					
-					// Inserir na T014.
-					DatatypePropertyDomain datatypePropertyDomain = new DatatypePropertyDomain();
-					datatypePropertyDomain.setDatatypeProperty(datatypeProperty);
-					datatypePropertyDomain.setClassDomain(classDao.getByTable(column.getTable()));
-					datatypePropertyDomain.setDatatypeSubpropertyOf(false);
-					datatypePropertyDomainDao.saveOrUpdate(datatypePropertyDomain);
-				}
-				else {
-					// Inserir na T020.
-					ColumnToDatatypeProperty columnToDatatypeProperty = new ColumnToDatatypeProperty();
-					columnToDatatypeProperty.setColumn(column);
-					columnToDatatypeProperty.setDatatypeProperty(datatypePropertyExistente);
-					columnToDatatypePropertyDao.saveOrUpdate(columnToDatatypeProperty);
-				}
+				// Inserir na T020.
+				ColumnToDatatypeProperty columnToDatatypeProperty = new ColumnToDatatypeProperty();
+				columnToDatatypeProperty.setColumn(column);
+				columnToDatatypeProperty.setDatatypeProperty(datatypeProperty);
+				columnToDatatypePropertyDao.saveOrUpdate(columnToDatatypeProperty); // PASSO 19
+				
+				// Inserir na T014.
+				DatatypePropertyDomain datatypePropertyDomain = new DatatypePropertyDomain();
+				datatypePropertyDomain.setDatatypeProperty(datatypeProperty);
+				datatypePropertyDomain.setClassDomain(classDao.getByTable(column.getTable()));
+				datatypePropertyDomain.setDatatypeSubpropertyOf(true);
+				datatypePropertyDomainDao.saveOrUpdate(datatypePropertyDomain); // PASSO 23, PASSO 24
 			}
 		}
 	}
@@ -681,7 +675,7 @@ public class RdbToOntoBO {
 	 * @param ontology
 	 */
 	public void importDatatypeProperty02(Database database, Ontology ontology) {
-		// Buscar todas as colunas do database passado com C003_IND_DESCRIPTION = 0 e C003_IND_COLUMN_CHECK = 0.
+		// Buscar todas as colunas do database passado com C003_IND_DESCRIPTION = 0 AND C003_IND_COLUMN_CHECK = 0.
 		List<Column> columns = columnDao.getByIndDescriptionAndIndColumnCheck(database.getId(), false, false);  
 
 		if (columns == null || columns.size() == 0) {
@@ -706,41 +700,51 @@ public class RdbToOntoBO {
 			description = "a" + Util.funcaoMaiuscula(column.getLogicalName());
 			datatypeProperty.setDescription(description);
 			datatypeProperty.setOntology(ontology);
+			datatypeProperty.setIndCommonConcept(true); // PASSO 20.1
 
 			DatatypeOnto datatypeOnto = datatypeOntoDao.getByDatatypeDb(column.getDatatypeDb());
 
 			if (datatypeOnto != null) {
 				datatypeProperty.setDatatypeOnto(datatypeOnto);
 
-				// Inserir na T013.
-				datatypePropertyDao.saveOrUpdate(datatypeProperty);
+				// Verificando se já existe uma coluna com esse nome registrado na T013.
+				// Se já existir, não precisa cadastrar novamente. Apenas vincular na T020.
+				DatatypeProperty datatypePropertyExistente = datatypePropertyDao.getByDatatypeProperty(datatypeProperty); 
+
+				if (datatypePropertyExistente == null) {
+					// Inserir na T013.
+					datatypePropertyDao.saveOrUpdate(datatypeProperty);
+				}
 
 				// Inserir na T020.
 				ColumnToDatatypeProperty columnToDatatypeProperty = new ColumnToDatatypeProperty();
 				columnToDatatypeProperty.setColumn(column);
 				columnToDatatypeProperty.setDatatypeProperty(datatypeProperty);
-				columnToDatatypePropertyDao.saveOrUpdate(columnToDatatypeProperty);
+				columnToDatatypePropertyDao.saveOrUpdate(columnToDatatypeProperty); // PASSO 20
 				
 				// Inserir na T014.
 				DatatypePropertyDomain datatypePropertyDomain = new DatatypePropertyDomain();
 				datatypePropertyDomain.setDatatypeProperty(datatypeProperty);
 				datatypePropertyDomain.setClassDomain(classDao.getByTable(column.getTable()));
-				datatypePropertyDomain.setDatatypeSubpropertyOf(false);
-				datatypePropertyDomainDao.saveOrUpdate(datatypePropertyDomain);
+				datatypePropertyDomain.setDatatypeSubpropertyOf(true);
+				datatypePropertyDomainDao.saveOrUpdate(datatypePropertyDomain); // PASSO 23
 			}
 		}
 	}
 	
 	public void importObjectProperty(Database database, Ontology ontology) {
 		
-		// Colunas com C003_IND_COLUMN_CHECK = 0 AND C003_IND_PRIMARY_KEY = 0 AND C003_IND_FOREIGN_KEY = 0 AND C003_IND_UNIQUE_KEY = 1 (PASSO 18.1)
-		importObjectProperty01(database, ontology);
+		// Colunas com C003_IND_COLUMN_CHECK = 0 AND C003_IND_PRIMARY_KEY = 0 AND C003_IND_FOREIGN_KEY = 0 AND C003_IND_UNIQUE_KEY = 1
+		importObjectProperty01(database, ontology); // PASSO 18.1
 
-		// Colunas com C003_IND_COLUMN_CHECK = 0 AND C003_IND_PRIMARY_KEY = 1 AND C003_IND_FOREIGN_KEY = 0 AND C003_IND_UNIQUE_KEY = 0 (PASSO 18.2)
-		importObjectProperty02(database, ontology);
+		// Colunas com C003_IND_COLUMN_CHECK = 0 AND C003_IND_PRIMARY_KEY = 1 AND C003_IND_FOREIGN_KEY = 0 AND C003_IND_UNIQUE_KEY = 0
+		importObjectProperty02(database, ontology); // PASSO 18.2
 		
-		// Colunas com C003_IND_COLUMN_CHECK = 1 AND C003_IND_PRIMARY_KEY = 0 AND C003_IND_FOREIGN_KEY = 0 AND C003_IND_UNIQUE_KEY = 0. (PASSO 22)
-		importObjectProperty03(database, ontology);
+		// Colunas com C003_IND_COLUMN_CHECK = 1 AND C003_IND_PRIMARY_KEY = 0 AND C003_IND_FOREIGN_KEY = 0 AND C003_IND_UNIQUE_KEY = 0.
+		importObjectProperty03(database, ontology); // PASSO 22
+		
+		// Colunas com C003_IND_PRIMARY_KEY = 1 de tabelas associativas.
+		importObjectProperty04(database, ontology); // PASSO 27
 	}
 	
 	/**
@@ -774,6 +778,7 @@ public class RdbToOntoBO {
 			description = "UK" + Util.funcaoMaiuscula(column.getLogicalName());
 			objectProperty.setDescription(description);
 			objectProperty.setOntology(ontology);
+			objectProperty.setMinCardinality(true); // PASSO 18.3
 			
 			// Inserir na T019.
 			objectPropertyDao.saveOrUpdate(objectProperty);
@@ -787,9 +792,6 @@ public class RdbToOntoBO {
 			// Inserir na T022.
 			ObjectPropertyDomainRange objectPropertyDomainRange = new ObjectPropertyDomainRange();
 			objectPropertyDomainRange.setClassDomain(classDao.getByTable(column.getTable()));
-			
-			ColumnCheckValue columnCheckValue = columnCheckValueDao.getByColumn(column);
-			objectPropertyDomainRange.setClassRange(classDao.getByCheckSubject(columnCheckValue.getCheckValue().getCheckSubject()));
 			
 			objectPropertyDomainRange.setObjectProperty(objectProperty);
 			
@@ -828,6 +830,7 @@ public class RdbToOntoBO {
 			description = "PK" + Util.funcaoMaiuscula(column.getLogicalName());
 			objectProperty.setDescription(description);
 			objectProperty.setOntology(ontology);
+			objectProperty.setMinCardinality(true); // PASSO 18.3
 			
 			// Inserir na T019.
 			objectPropertyDao.saveOrUpdate(objectProperty);
@@ -841,9 +844,6 @@ public class RdbToOntoBO {
 			// Inserir na T022.
 			ObjectPropertyDomainRange objectPropertyDomainRange = new ObjectPropertyDomainRange();
 			objectPropertyDomainRange.setClassDomain(classDao.getByTable(column.getTable()));
-			
-			ColumnCheckValue columnCheckValue = columnCheckValueDao.getByColumn(column);
-			objectPropertyDomainRange.setClassRange(classDao.getByCheckSubject(columnCheckValue.getCheckValue().getCheckSubject()));
 			
 			objectPropertyDomainRange.setObjectProperty(objectProperty);
 			
@@ -884,6 +884,56 @@ public class RdbToOntoBO {
 			objectProperty.setOntology(ontology);
 			
 			// Inserir na T019.
+			objectPropertyDao.saveOrUpdate(objectProperty); // PASSO 22
+			
+			// Inserir na T021.
+			ColumnToObjectProperty columnToObjectProperty = new ColumnToObjectProperty();
+			columnToObjectProperty.setColumn(column);
+			columnToObjectProperty.setObjectProperty(objectProperty);
+			columnToObjectPropertyDao.saveOrUpdate(columnToObjectProperty); // PASSO 22
+			
+			// Inserir na T022.
+			ObjectPropertyDomainRange objectPropertyDomainRange = new ObjectPropertyDomainRange();
+			objectPropertyDomainRange.setClassDomain(classDao.getByTable(column.getTable()));
+			
+			ColumnCheckValue columnCheckValue = columnCheckValueDao.getByColumn(column);
+			objectPropertyDomainRange.setClassRange(classDao.getByCheckSubject(columnCheckValue.getCheckValue().getCheckSubject()));
+			
+			objectPropertyDomainRange.setObjectProperty(objectProperty);
+			
+			objectPropertyDomainRangeDao.saveOrUpdate(objectPropertyDomainRange); // PASSO 22
+		}
+	}
+	
+	/**
+	 * 
+	 * @param database
+	 * @param ontology
+	 */
+	public void importObjectProperty04(Database database, Ontology ontology) {
+		// Colunas com C003_IND_PRIMARY_KEY = 1.
+		List<Column> columns = columnDao.getByIndPrimarykey(database.getId(), true); // PASSO 27
+		
+		if (columns == null || columns.size() == 0) {
+			return;
+		}
+		
+		String description;
+		
+		for (Column column : columns) {
+			
+			// PASSO 27
+			if (!column.getTable().isAssociative()) {
+				continue;
+			}
+			
+			ObjectProperty objectProperty = new ObjectProperty();			
+			description = "KM" + Util.funcaoMaiuscula(column.getLogicalName());
+			objectProperty.setDescription(description);
+			objectProperty.setOntology(ontology);
+			objectProperty.setMinCardinality(true);
+			
+			// Inserir na T019.
 			objectPropertyDao.saveOrUpdate(objectProperty);
 			
 			// Inserir na T021.
@@ -895,10 +945,7 @@ public class RdbToOntoBO {
 			// Inserir na T022.
 			ObjectPropertyDomainRange objectPropertyDomainRange = new ObjectPropertyDomainRange();
 			objectPropertyDomainRange.setClassDomain(classDao.getByTable(column.getTable()));
-			
-			ColumnCheckValue columnCheckValue = columnCheckValueDao.getByColumn(column);
-			objectPropertyDomainRange.setClassRange(classDao.getByCheckSubject(columnCheckValue.getCheckValue().getCheckSubject()));
-			
+			objectPropertyDomainRange.setClassRange(classDao.getByTable(column.getFkTable()));
 			objectPropertyDomainRange.setObjectProperty(objectProperty);
 			
 			objectPropertyDomainRangeDao.saveOrUpdate(objectPropertyDomainRange);

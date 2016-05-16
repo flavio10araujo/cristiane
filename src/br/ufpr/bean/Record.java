@@ -7,6 +7,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 @Entity
 @javax.persistence.Table(name = "t004_record")
@@ -18,11 +20,16 @@ public class Record implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "c004_record_id", nullable = false, unique = true)
 	private Long id;
-
-	@Column(name = "c004_description", nullable = false)
-	private String description;
-
+	
+	@ManyToOne
+	@JoinColumn(name = "c002_table_id")
 	private Table table;
+	
+	@Column(name = "c004_table_columns")
+	private String tableColumns;
+	
+	@Column(name = "c004_column_values")
+	private String columnvalues;
 
 	public Long getId() {
 		return id;
@@ -30,14 +37,6 @@ public class Record implements Serializable {
 
 	public void setId(Long id) {
 		this.id = id;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
 	}
 
 	public Table getTable() {
@@ -48,4 +47,19 @@ public class Record implements Serializable {
 		this.table = table;
 	}
 
+	public String getTableColumns() {
+		return tableColumns;
+	}
+
+	public void setTableColumns(String tableColumns) {
+		this.tableColumns = tableColumns;
+	}
+
+	public String getColumnvalues() {
+		return columnvalues;
+	}
+
+	public void setColumnvalues(String columnvalues) {
+		this.columnvalues = columnvalues;
+	}
 }

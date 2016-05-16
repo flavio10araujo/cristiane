@@ -42,6 +42,10 @@ public class Class implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "c007_check_subject_id")
 	private CheckSubject checkSubject;
+	
+	@ManyToOne
+	@JoinColumn(name = "c004_record_id")
+	private Record record;
 
 	public Long getId() {
 		return id;
@@ -97,5 +101,13 @@ public class Class implements Serializable {
 
 	public void setCheckSubject(CheckSubject checkSubject) {
 		this.checkSubject = checkSubject;
+	}
+
+	public Record getRecord() {
+		return record;
+	}
+
+	public void setRecord(Record record) {
+		this.record = record;
 	}
 }

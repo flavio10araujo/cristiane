@@ -25,16 +25,16 @@ public class Instance implements Serializable {
 	private String description;
 	
 	@ManyToOne
-	@JoinColumn(name = "c013_datatype_property_id")
-	private DatatypeProperty datatypeProperty;
-	
-	@ManyToOne
 	@JoinColumn(name = "c011_class_id")
 	private br.ufpr.bean.Class clazz;
 	
 	@ManyToOne
 	@JoinColumn(name = "c016_ontology_id")
 	private Ontology ontology;
+	
+	@ManyToOne
+	@JoinColumn(name = "c004_record_id")
+	private Record record;
 
 	public Long getId() {
 		return id;
@@ -52,14 +52,6 @@ public class Instance implements Serializable {
 		this.description = description;
 	}
 
-	public DatatypeProperty getDatatypeProperty() {
-		return datatypeProperty;
-	}
-
-	public void setDatatypeProperty(DatatypeProperty datatypeProperty) {
-		this.datatypeProperty = datatypeProperty;
-	}
-
 	public br.ufpr.bean.Class getClazz() {
 		return clazz;
 	}
@@ -74,5 +66,13 @@ public class Instance implements Serializable {
 
 	public void setOntology(Ontology ontology) {
 		this.ontology = ontology;
+	}
+
+	public Record getRecord() {
+		return record;
+	}
+
+	public void setRecord(Record record) {
+		this.record = record;
 	}
 }
