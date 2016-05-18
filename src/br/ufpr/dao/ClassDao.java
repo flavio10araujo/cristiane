@@ -10,6 +10,12 @@ import br.ufpr.bean.Table;
 
 public class ClassDao extends GenericDao {
 
+	@SuppressWarnings("unchecked")
+	public List<br.ufpr.bean.Class> listAll() {
+		Criteria criteria = getSession().createCriteria(br.ufpr.bean.Class.class);
+		return criteria.list();
+	}
+	
 	public br.ufpr.bean.Class getByCheckSubject(CheckSubject checkSubject) {
 		if (checkSubject == null) {
 			return null;

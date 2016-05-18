@@ -20,5 +20,9 @@
 	<definition name="tiles.cleanDataBase" extends="mainLayout">
 		<put name="body" value="/pages/cleanDataBase.jsp"></put>	
 	</definition>
+	
+	<definition name="tiles.downloadOWLFile" extends="mainLayout">
+		<put name="body" value="/pages/downloadOWLFile.jsp"></put>	
+	</definition>
 
 </tiles-definitions>

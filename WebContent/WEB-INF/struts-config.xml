@@ -28,6 +28,14 @@
 		<action path="/CleanDataBase" type="br.ufpr.action.CleanDataBaseAction" name="rdbToOntoForm">
 			<forward name="success" path="tiles.cleanDataBase" />
 		</action>
+		
+		<action path="/GoDownloadOWLFile" type="br.ufpr.action.GoRdbToOntoAction" name="rdbToOntoForm">
+			<forward name="success" path="tiles.downloadOWLFile" />
+		</action>
+		
+		<action path="/DownloadOWLFile" type="br.ufpr.action.DownloadOWLFileAction" name="rdbToOntoForm">
+			<forward name="success" path="tiles.downloadOWLFile" />
+		</action>			
 	</action-mappings>
 	
 	<controller processorClass="org.apache.struts.tiles.TilesRequestProcessor"/>

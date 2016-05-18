@@ -9,7 +9,7 @@ public class CleanDataBaseBO {
 	DatabaseDao databaseDao = new DatabaseDao();
 
 	/**
-	 * Função utilizada para apagar todos os dados do banco.
+	 * FunÃ§Ã£o utilizada para apagar todos os dados do banco.
 	 * 
 	 * @return
 	 * @throws SQLException 

@@ -1,5 +1,7 @@
 package br.ufpr.dao;
 
+import java.util.List;
+
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
 
@@ -19,5 +21,13 @@ public class DatatypePropertyDao extends GenericDao {
 		catch (Exception e) {
 			return null;
 		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<DatatypeProperty> getByIndCommonConceptAndIndDescription(Boolean indCommonConcept, Boolean indDescription) {
+		Criteria criteria = getSession().createCriteria(DatatypeProperty.class);
+		criteria.add(Restrictions.eq("indCommonConcept", indCommonConcept));
+		criteria.add(Restrictions.eq("indDescription", indDescription));
+		return criteria.list();
 	}
 }
