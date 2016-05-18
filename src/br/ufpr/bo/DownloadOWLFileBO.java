@@ -4,9 +4,11 @@ import java.sql.SQLException;
 import java.util.List;
 
 import br.ufpr.bean.DatatypeProperty;
+import br.ufpr.bean.DatatypePropertyDomain;
 import br.ufpr.bean.Hierarchy;
 import br.ufpr.dao.ClassDao;
 import br.ufpr.dao.DatatypePropertyDao;
+import br.ufpr.dao.DatatypePropertyDomainDao;
 import br.ufpr.dao.HierarchyDao;
 
 public class DownloadOWLFileBO {
@@ -14,6 +16,7 @@ public class DownloadOWLFileBO {
 	ClassDao classDao = new ClassDao();
 	HierarchyDao hierarchyDao = new HierarchyDao();
 	DatatypePropertyDao datatypePropertyDao = new DatatypePropertyDao();
+	DatatypePropertyDomainDao datatypePropertyDomainDao = new DatatypePropertyDomainDao();
 
 	/**
 	 * Função utilizada para gerar o arquivo OWL.
@@ -25,8 +28,8 @@ public class DownloadOWLFileBO {
 		StringBuffer file = createOWLHeader();
 		file.append(setDeclaration());
 		file.append(setSubClassOf());
-		//file.append(setDisjointClasses());
-		//file.append(setDataPropertyDomain());
+		file.append(setDisjointClasses());
+		file.append(setDataPropertyDomain());
 		
 		return file.append(createOWLFooter());
 	}
@@ -96,20 +99,20 @@ public class DownloadOWLFileBO {
 	public StringBuffer setDisjointClasses() {
 		StringBuffer file = new StringBuffer();
 		
-		/*
-		 DISJOIUNT CLASS:
-		Ainda compondo a definição de uma classe, podemos também informar as classes disjuntas, ou seja, que não fazem parte do domínio da classe representada. A Tag para classe disjunta segue o modelo abaixo.
-		    <DisjointClasses>
-		        <Class IRI="#Aluno"/>
-		        <Class IRI="#Matematica"/>
-		        <Class IRI="#Portugues"/>
-		        <Class IRI="#Professor"/>
-		    </DisjointClasses>
+		List<br.ufpr.bean.Class> classList = classDao.listAll();
 		
-		Isso quer dizer que estas classes não são equivalentes. Cada uma representada na lista indica que um aluno não é matemática, nem português...etc.
-		DESENVOLVER:
-		Para produzir uma tag de classes disjuntas é necessário gerar uma tag para cada classe diferente da classe que está gerando a tag. Dados da T011.
-		 */
+		for (br.ufpr.bean.Class classThis : classList) {
+			file.append("<DisjointClasses>");
+			file.append("<Class IRI=\"#");file.append(classThis.getName());file.append("\" />");
+			
+			for (br.ufpr.bean.Class classOther : classList) {
+				if (classThis.getId() != classOther.getId()) {
+					file.append("<Class IRI=\"#");file.append(classOther.getName());file.append("\" />");
+				}
+			}
+			
+			file.append("</DisjointClasses>");
+		}
 		
 		return file;
 	}
@@ -128,11 +131,15 @@ public class DownloadOWLFileBO {
 		// Para gerar o data property deve ser processado todos os registros da T013, em que (C013_IND_COMMON_CONCEPT = 0 AND C013_IND_DESCRIPTION = 0). 
 		//file.append("<DataPropertyDomain><DataProperty IRI=\"#matricula_aluno\" /><Class IRI=\"#Aluno\" /></DataPropertyDomain>");
     	List<DatatypeProperty> datatypePropertyList = datatypePropertyDao.getByIndCommonConceptAndIndDescription(false, false);
+    	DatatypePropertyDomain datatypePropertyDomain = null; 
     	
     	for (DatatypeProperty datatypeProperty : datatypePropertyList) {
     		file.append("<DataPropertyDomain>");
     		file.append("<DataProperty IRI=\"#");file.append(datatypeProperty.getDescription());file.append("\" />");
-    		file.append("<Class IRI=\"#");file.append("Aluno");file.append("\" />");
+    		
+    		datatypePropertyDomain = datatypePropertyDomainDao.getByDatatypePropertyID(datatypeProperty.getId()).get(0);
+    		file.append("<Class IRI=\"#");file.append(datatypePropertyDomain.getClassDomain().getName());file.append("\" />");
+    		
     		file.append("</DataPropertyDomain>");
     	}
 		
@@ -143,7 +150,23 @@ public class DownloadOWLFileBO {
 		StringBuffer file = new StringBuffer();
 		
 		// Para os registros da T013, em que (C013_IND_COMMON_CONCEPT = 1), o resultado da pesquisa na T014 retorne mais que 1 resultado.
-		file.append("<DataPropertyDomain><DataProperty IRI=\"#primeiro_nome\" /><ObjectUnionOf><Class IRI=\"#Pessoa\" /><Class IRI=\"#Portugues\" /></ObjectUnionOf></DataPropertyDomain>");
+		//file.append("<DataPropertyDomain><DataProperty IRI=\"#primeiro_nome\" /><ObjectUnionOf><Class IRI=\"#Pessoa\" /><Class IRI=\"#Portugues\" /></ObjectUnionOf></DataPropertyDomain>");
+		List<DatatypeProperty> datatypePropertyList = datatypePropertyDao.getByIndCommonConcept(true);
+		List<DatatypePropertyDomain> datatypePropertyDomainList = null; 
+		
+		for (DatatypeProperty datatypeProperty : datatypePropertyList) {
+    		file.append("<DataPropertyDomain>");
+    		file.append("<DataProperty IRI=\"#");file.append(datatypeProperty.getDescription());file.append("\" />");
+    		file.append("<ObjectUnionOf>");
+    		
+    		datatypePropertyDomainList = datatypePropertyDomainDao.getByDatatypePropertyID(datatypeProperty.getId());
+    		for (DatatypePropertyDomain datatypePropertyDomain : datatypePropertyDomainList) {
+    			file.append("<Class IRI=\"#");file.append(datatypePropertyDomain.getClassDomain().getName());file.append("\" />");
+    		}
+    		
+    		file.append("</ObjectUnionOf>");
+    		file.append("</DataPropertyDomain>");
+    	}
 
 		return file;
 	}
@@ -152,7 +175,34 @@ public class DownloadOWLFileBO {
 		StringBuffer file = new StringBuffer();
 		
 		// Para os registros da T013, em que (C013_IND_DESCRIPTION = 1).
-		file.append("<DataPropertyDomain><DataProperty IRI=\"#descricao\" /><Class IRI=\"#Thing\" /></DataPropertyDomain>");
+		//file.append("<DataPropertyDomain><DataProperty IRI=\"#descricao\" /><Class IRI=\"#Thing\" /></DataPropertyDomain>");
+		List<DatatypeProperty> datatypePropertyList = datatypePropertyDao.getByIndDescription(true);
+		
+		for (DatatypeProperty datatypeProperty : datatypePropertyList) {
+    		file.append("<DataPropertyDomain>");
+    		file.append("<DataProperty IRI=\"#");file.append(datatypeProperty.getDescription());file.append("\" />");
+    		file.append("<Class IRI=\"#Thing\" />");
+    		file.append("</DataPropertyDomain>");
+    	}
+		
+		List<DatatypePropertyDomain> datatypePropertyDomainList = null; 
+		
+		for (DatatypeProperty datatypeProperty : datatypePropertyList) {
+			
+    		datatypePropertyDomainList = datatypePropertyDomainDao.getByDatatypePropertyID(datatypeProperty.getId());
+    		
+    		for (DatatypePropertyDomain datatypePropertyDomain : datatypePropertyDomainList) {
+    			file.append("<DataPropertyDomain>");
+        		file.append("<DataProperty IRI=\"#");file.append(datatypeProperty.getDescription() + "_" + datatypePropertyDomain.getClassDomain().getName());file.append("\" />");
+    			file.append("<Class IRI=\"#");file.append(datatypePropertyDomain.getClassDomain().getName());file.append("\" />");
+    			file.append("</DataPropertyDomain>");
+    			
+    			file.append("<SubDataPropertyOf>");
+    			file.append("<DataProperty IRI=\"#");file.append(datatypeProperty.getDescription() + "_" + datatypePropertyDomain.getClassDomain().getName());file.append("\" />");
+    			file.append("<DataProperty IRI=\"#");file.append(datatypeProperty.getDescription());file.append("\" />");
+    			file.append("</SubDataPropertyOf>");
+    		}
+    	}
 		
 		return file;
 	}

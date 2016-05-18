@@ -34,10 +34,10 @@ public class DatatypeProperty implements Serializable {
 	private DatatypeOnto datatypeOnto;
 	
 	@Column(name = "c013_ind_common_concept")
-	private Boolean indCommonConcept;
+	private boolean indCommonConcept;
 	
 	@Column(name = "c013_ind_description")
-	private Boolean indDescription;
+	private boolean indDescription;
 	
 	public Long getId() {
 		return id;
@@ -71,19 +71,19 @@ public class DatatypeProperty implements Serializable {
 		this.datatypeOnto = datatypeOnto;
 	}
 
-	public Boolean getIndCommonConcept() {
+	public boolean isIndCommonConcept() {
 		return indCommonConcept;
 	}
 
-	public void setIndCommonConcept(Boolean indCommonConcept) {
+	public void setIndCommonConcept(boolean indCommonConcept) {
 		this.indCommonConcept = indCommonConcept;
 	}
 
-	public Boolean getIndDescription() {
+	public boolean isIndDescription() {
 		return indDescription;
 	}
 
-	public void setIndDescription(Boolean indDescription) {
+	public void setIndDescription(boolean indDescription) {
 		this.indDescription = indDescription;
 	}
 }

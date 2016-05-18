@@ -24,9 +24,23 @@ public class DatatypePropertyDao extends GenericDao {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<DatatypeProperty> getByIndCommonConceptAndIndDescription(Boolean indCommonConcept, Boolean indDescription) {
+	public List<DatatypeProperty> getByIndCommonConceptAndIndDescription(boolean indCommonConcept, boolean indDescription) {
 		Criteria criteria = getSession().createCriteria(DatatypeProperty.class);
 		criteria.add(Restrictions.eq("indCommonConcept", indCommonConcept));
+		criteria.add(Restrictions.eq("indDescription", indDescription));
+		return criteria.list();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<DatatypeProperty> getByIndCommonConcept(boolean indCommonConcept) {
+		Criteria criteria = getSession().createCriteria(DatatypeProperty.class);
+		criteria.add(Restrictions.eq("indCommonConcept", indCommonConcept));
+		return criteria.list();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<DatatypeProperty> getByIndDescription(boolean indDescription) {
+		Criteria criteria = getSession().createCriteria(DatatypeProperty.class);
 		criteria.add(Restrictions.eq("indDescription", indDescription));
 		return criteria.list();
 	}

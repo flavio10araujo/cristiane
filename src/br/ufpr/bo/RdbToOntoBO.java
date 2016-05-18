@@ -141,7 +141,7 @@ public class RdbToOntoBO {
 		
 		try {
 			// Chama a função que importa os valores nas tabelas T019, T021 e T022.
-			importObjectProperty(database, ontology); // PASSO 18.1, PASSO 18.2, PASSO 22
+			importObjectProperty(database, ontology); // PASSO 18.1, PASSO 18.2, PASSO 22, PASSO 27
 		}
 		catch (Exception e1) {
 			e1.printStackTrace();
@@ -745,6 +745,9 @@ public class RdbToOntoBO {
 		
 		// Colunas com C003_IND_PRIMARY_KEY = 1 de tabelas associativas.
 		importObjectProperty04(database, ontology); // PASSO 27
+		
+		// Colunas com C003_IND_FOREIGN_KEY = 1.
+		importObjectProperty05(database, ontology); // PASSO 30
 	}
 	
 	/**
@@ -931,7 +934,7 @@ public class RdbToOntoBO {
 			description = "KM" + Util.funcaoMaiuscula(column.getLogicalName());
 			objectProperty.setDescription(description);
 			objectProperty.setOntology(ontology);
-			objectProperty.setMinCardinality(true);
+			objectProperty.setMinCardinality(true); // PASSO 27.1
 			
 			// Inserir na T019.
 			objectPropertyDao.saveOrUpdate(objectProperty);
@@ -944,11 +947,62 @@ public class RdbToOntoBO {
 			
 			// Inserir na T022.
 			ObjectPropertyDomainRange objectPropertyDomainRange = new ObjectPropertyDomainRange();
-			objectPropertyDomainRange.setClassDomain(classDao.getByTable(column.getTable()));
 			objectPropertyDomainRange.setClassRange(classDao.getByTable(column.getFkTable()));
 			objectPropertyDomainRange.setObjectProperty(objectProperty);
 			
+			// PASSO 28
+			Column columnAux = columnDao.getByIndPrimaryKeyTableAndId(column);
+			objectPropertyDomainRange.setClassDomain(classDao.getByTable(columnAux.getFkTable()));
+			
 			objectPropertyDomainRangeDao.saveOrUpdate(objectPropertyDomainRange);
+		}
+	}
+	
+	/**
+	 * 
+	 * @param database
+	 * @param ontology
+	 */
+	public void importObjectProperty05(Database database, Ontology ontology) {
+		// Colunas com C003_IND_FOREIGN_KEY = 1.
+		List<Column> columns = columnDao.getByIndForeignkey(database.getId(), true);
+		
+		if (columns == null || columns.size() == 0) {
+			return;
+		}
+		
+		String description;
+		
+		for (Column column : columns) {
+			
+			if (column.getTable().isAssociative()) {
+				continue;
+			}
+			
+			ObjectProperty objectProperty = new ObjectProperty();			
+			description = "KS" + Util.funcaoMaiuscula(column.getTable().getLogicalName()) + "Tem" + Util.funcaoMaiuscula(column.getLogicalName()); // PASSO 30
+			objectProperty.setDescription(description);
+			objectProperty.setOntology(ontology);
+			
+			// Inserir na T019.
+			objectPropertyDao.saveOrUpdate(objectProperty); // PASSO 31
+			
+			// Inserir na T021.
+			ColumnToObjectProperty columnToObjectProperty = new ColumnToObjectProperty();
+			columnToObjectProperty.setColumn(column);
+			columnToObjectProperty.setObjectProperty(objectProperty);
+			columnToObjectPropertyDao.saveOrUpdate(columnToObjectProperty); // PASSO 31
+			
+			// Inserir na T022.
+			ObjectPropertyDomainRange objectPropertyDomainRange = new ObjectPropertyDomainRange();
+			
+			//TODO
+			//objectPropertyDomainRange.setClassDomain(classDao.getByTable(column.getTable()));
+			
+			objectPropertyDomainRange.setClassRange(classDao.getByTable(column.getFkTable()));
+			objectPropertyDomainRange.setObjectProperty(objectProperty);
+			
+			objectPropertyDomainRangeDao.saveOrUpdate(objectPropertyDomainRange); // PASSO 31
 		}
 	}
 }

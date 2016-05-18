@@ -85,4 +85,32 @@ public class ColumnDao extends GenericDao {
 		
 		return filterColumnsByDatabase(databaseId, columns);
 	}
+	
+	public List<Column> getByIndForeignkey(Long databaseId, boolean indForeignKey) {
+		Criteria criteria = getSession().createCriteria(Column.class);
+		criteria.add(Restrictions.eq("foreignKey", indForeignKey));
+		
+		@SuppressWarnings("unchecked")
+		List<Column> columns = criteria.list();
+		
+		if (columns == null || columns.size() == 0) {
+			return null;
+		}
+		
+		return filterColumnsByDatabase(databaseId, columns);
+	}
+	
+	public Column getByIndPrimaryKeyTableAndId(Column column) {
+		Criteria criteria = getSession().createCriteria(Column.class);
+		criteria.add(Restrictions.eq("primaryKey", column.isPrimaryKey()));
+		criteria.add(Restrictions.eq("table.id", column.getTable().getId()));
+		criteria.add(Restrictions.ne("id", column.getId()));
+		
+		try {
+			return (Column) criteria.list().get(0);
+		}
+		catch(Exception e) {
+			return null;
+		}
+	}
 }
