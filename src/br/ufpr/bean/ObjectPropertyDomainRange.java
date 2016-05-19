@@ -15,17 +15,16 @@ public class ObjectPropertyDomainRange implements Serializable {
 
 	@Id
 	@ManyToOne
+	@JoinColumn(name = "c019_object_property_id")
+	private ObjectProperty objectProperty;
+	
+	@ManyToOne
 	@JoinColumn(name = "c011_class_id_domain")
 	private br.ufpr.bean.Class classDomain;
 	
-	@Id
 	@ManyToOne
 	@JoinColumn(name = "c011_class_id_range")
 	private br.ufpr.bean.Class classRange;
-	
-	@ManyToOne
-	@JoinColumn(name = "c019_object_property_id")
-	private ObjectProperty objectProperty;
 
 	public br.ufpr.bean.Class getClassDomain() {
 		return classDomain;

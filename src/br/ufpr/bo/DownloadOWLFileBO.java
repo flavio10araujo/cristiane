@@ -6,10 +6,16 @@ import java.util.List;
 import br.ufpr.bean.DatatypeProperty;
 import br.ufpr.bean.DatatypePropertyDomain;
 import br.ufpr.bean.Hierarchy;
+import br.ufpr.bean.Instance;
+import br.ufpr.bean.ObjectProperty;
+import br.ufpr.bean.ObjectPropertyDomainRange;
 import br.ufpr.dao.ClassDao;
 import br.ufpr.dao.DatatypePropertyDao;
 import br.ufpr.dao.DatatypePropertyDomainDao;
 import br.ufpr.dao.HierarchyDao;
+import br.ufpr.dao.InstanceDao;
+import br.ufpr.dao.ObjectPropertyDao;
+import br.ufpr.dao.ObjectPropertyDomainRangeDao;
 
 public class DownloadOWLFileBO {
 
@@ -17,6 +23,9 @@ public class DownloadOWLFileBO {
 	HierarchyDao hierarchyDao = new HierarchyDao();
 	DatatypePropertyDao datatypePropertyDao = new DatatypePropertyDao();
 	DatatypePropertyDomainDao datatypePropertyDomainDao = new DatatypePropertyDomainDao();
+	ObjectPropertyDao objectPropertyDao = new ObjectPropertyDao();
+	ObjectPropertyDomainRangeDao objectPropertyDomainRangeDao = new ObjectPropertyDomainRangeDao();
+	InstanceDao instanceDao = new InstanceDao();
 
 	/**
 	 * Função utilizada para gerar o arquivo OWL.
@@ -30,14 +39,16 @@ public class DownloadOWLFileBO {
 		file.append(setSubClassOf());
 		file.append(setDisjointClasses());
 		file.append(setDataPropertyDomain());
-		
+		file.append(setObjectProperty());
+		file.append(setInstance());
+
 		return file.append(createOWLFooter());
 	}
 	
 	public StringBuffer createOWLHeader() {
 		StringBuffer header = new StringBuffer();
 		
-		header.append("<?xml version=\"1.0\"?>"
+		/*header.append("<?xml version=\"1.0\"?>"
 				+ "<!DOCTYPE rdf:RDF ["
 				+ "<!ENTITY owl \"http://www.w3.org/2002/07/owl#\" >"
 				+ "<!ENTITY xsd \"http://www.w3.org/2001/XMLSchema#\" >"
@@ -51,14 +62,29 @@ public class DownloadOWLFileBO {
 				+ "xmlns:rdfs=\"http://www.w3.org/2000/01/rdf-schema#\" "
 				+ "xmlns:owl=\"http://www.w3.org/2002/07/owl#\" "
 				+ "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema#\" "
-				+ "xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">");
+				+ "xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">");*/
+		
+		header.append("<?xml version=\"1.0\"?>"
+				+ "<Ontology xmlns=\"http://www.w3.org/2002/07/owl#\" "
+				+ "xml:base=\"http://www.semanticweb.org/home/ontologies/2016/4/untitled-ontology-24\" "
+				+ "xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" "
+				+ "xmlns:xml=\"http://www.w3.org/XML/1998/namespace\" "
+				+ "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema#\" "
+				+ "xmlns:rdfs=\"http://www.w3.org/2000/01/rdf-schema#\" "
+				+ "ontologyIRI=\"http://www.semanticweb.org/home/ontologies/2016/4/untitled-ontology-24\"> "
+				+ "<Prefix name=\"owl\" IRI=\"http://www.w3.org/2002/07/owl#\" />"
+				+ "<Prefix name=\"rdf\" IRI=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" />"
+				+ "<Prefix name=\"xml\" IRI=\"http://www.w3.org/XML/1998/namespace\" />"
+				+ "<Prefix name=\"xsd\" IRI=\"http://www.w3.org/2001/XMLSchema#\" />"
+				+ "<Prefix name=\"rdfs\" IRI=\"http://www.w3.org/2000/01/rdf-schema#\" />");
 		
 		return header;
 	}
 	
 	public StringBuffer createOWLFooter() {
 		StringBuffer footer = new StringBuffer();
-		footer.append("</rdf:RDF>");
+		//footer.append("</rdf:RDF>");
+		footer.append("</Ontology>");
 		return footer;
 	}
 	
@@ -203,6 +229,68 @@ public class DownloadOWLFileBO {
     			file.append("</SubDataPropertyOf>");
     		}
     	}
+		
+		return file;
+	}
+	
+	public StringBuffer setObjectProperty() {
+		StringBuffer file = new StringBuffer();
+		
+		//file.append("<Declaration><ObjectProperty IRI=\"#leciona\"/></Declaration>");
+		//file.append("<ObjectPropertyDomain><ObjectProperty IRI=\"#leciona\" /><Class IRI=\"#Professor\" /></ObjectPropertyDomain>");
+		//file.append("<ObjectPropertyRange><ObjectProperty IRI=\"#leciona\" /><Class IRI=\"#Modulo\" /></ObjectPropertyRange>");
+		List<ObjectProperty> objectPropertyList = objectPropertyDao.listAll();
+		ObjectPropertyDomainRange objectPropertyDomainRange = null;
+		
+		for (ObjectProperty objectProperty : objectPropertyList) {
+			file.append("<Declaration>");
+			file.append("<ObjectProperty IRI=\"#");
+			file.append(objectProperty.getDescription());
+			file.append("\"/></Declaration>");
+			
+			objectPropertyDomainRange = objectPropertyDomainRangeDao.findByObjectProperty(objectProperty);
+			
+			//TODO - retirar esse IF depois de terminar o passo 31
+			if (objectPropertyDomainRange.getClassDomain() != null) {
+			file.append("<ObjectPropertyDomain>");
+			file.append("<ObjectProperty IRI=\"#");
+			file.append(objectProperty.getDescription());
+			file.append("\" /><Class IRI=\"#");
+			file.append(objectPropertyDomainRange.getClassDomain().getName());
+			file.append("\" /></ObjectPropertyDomain>");
+			}
+			
+			if (objectPropertyDomainRange.getClassRange() != null) {
+				file.append("<ObjectPropertyRange>");
+				file.append("<ObjectProperty IRI=\"#");
+				file.append(objectProperty.getDescription());
+				file.append("\" /><Class IRI=\"#");
+				file.append(objectPropertyDomainRange.getClassRange().getName());
+				file.append("\" /></ObjectPropertyRange>");
+			}
+		}
+		
+		return file;
+	}
+	
+	public StringBuffer setInstance() {
+		StringBuffer file = new StringBuffer();
+		
+		//file.append("<Declaration><NamedIndividual IRI=\"#M101\" /></Declaration>");
+		//file.append("<ClassAssertion><Class IRI=\"#Matematica\" /><NamedIndividual IRI=\"#M101\" /></ClassAssertion>");
+		List<Instance> instanceList = instanceDao.listAll();
+		
+		for (Instance instance : instanceList) {
+			file.append("<Declaration><NamedIndividual IRI=\"#");
+			file.append(instance.getDescription());
+			file.append("\" /></Declaration>");
+			
+			file.append("<ClassAssertion><Class IRI=\"#");
+			file.append(instance.getClazz().getName());
+			file.append("\" /><NamedIndividual IRI=\"#");
+			file.append(instance.getDescription());
+			file.append("\" /></ClassAssertion>");
+		}
 		
 		return file;
 	}
