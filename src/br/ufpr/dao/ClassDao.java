@@ -3,6 +3,9 @@ package br.ufpr.dao;
 import java.util.List;
 
 import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 
 import br.ufpr.bean.CheckSubject;
@@ -12,8 +15,27 @@ public class ClassDao extends GenericDao {
 
 	@SuppressWarnings("unchecked")
 	public List<br.ufpr.bean.Class> listAll() {
-		Criteria criteria = getSession().createCriteria(br.ufpr.bean.Class.class);
-		return criteria.list();
+		Session session = getSession();
+		Transaction tx = null;
+		List<br.ufpr.bean.Class> retorno = null;
+
+		try {
+			tx = session.beginTransaction();
+			Criteria criteria = session.createCriteria(br.ufpr.bean.Class.class);
+			retorno = criteria.list();
+			tx.commit();
+		}
+		catch (HibernateException e) {
+			if (tx != null) {
+				tx.rollback();
+			}
+			e.printStackTrace(); 
+		}
+		finally {
+			session.close(); 
+		}
+
+		return retorno;
 	}
 	
 	public br.ufpr.bean.Class getByCheckSubject(CheckSubject checkSubject) {
@@ -21,22 +43,60 @@ public class ClassDao extends GenericDao {
 			return null;
 		}
 		
-		Criteria criteria = getSession().createCriteria(br.ufpr.bean.Class.class);
-		criteria.add(Restrictions.eq("checkSubject", checkSubject));
-		
+		Session session = getSession();
+		Transaction tx = null;
+		 br.ufpr.bean.Class retorno = null;
+
 		try {
-			return (br.ufpr.bean.Class) criteria.list().get(0);
+			tx = session.beginTransaction();
+			Criteria criteria = session.createCriteria(br.ufpr.bean.Class.class);
+			criteria.add(Restrictions.eq("checkSubject", checkSubject));
+			
+			try {
+				retorno = (br.ufpr.bean.Class) criteria.list().get(0);
+			}
+			catch (Exception e) {
+				retorno = null;
+			}
+			tx.commit();
 		}
-		catch (Exception e) {
-			return null;
+		catch (HibernateException e) {
+			if (tx != null) {
+				tx.rollback();
+			}
+			e.printStackTrace(); 
 		}
+		finally {
+			session.close(); 
+		}
+
+		return retorno;
 	}
 	
 	@SuppressWarnings("unchecked")
 	public List<br.ufpr.bean.Class> getWhenCheckSubjectNotNull() {
-		Criteria criteria = getSession().createCriteria(br.ufpr.bean.Class.class);
-		criteria.add(Restrictions.isNotNull("checkSubject"));
-		return criteria.list();
+		Session session = getSession();
+		Transaction tx = null;
+		List<br.ufpr.bean.Class> retorno = null;
+
+		try {
+			tx = session.beginTransaction();
+			Criteria criteria = session.createCriteria(br.ufpr.bean.Class.class);
+			criteria.add(Restrictions.isNotNull("checkSubject"));
+			retorno = criteria.list();
+			tx.commit();
+		}
+		catch (HibernateException e) {
+			if (tx != null) {
+				tx.rollback();
+			}
+			e.printStackTrace(); 
+		}
+		finally {
+			session.close(); 
+		}
+
+		return retorno;
 	}
 	
 	public br.ufpr.bean.Class getByTable(Table table) {
@@ -44,14 +104,33 @@ public class ClassDao extends GenericDao {
 			return null;
 		}
 		
-		Criteria criteria = getSession().createCriteria(br.ufpr.bean.Class.class);
-		criteria.add(Restrictions.eq("table", table));
-		
+		Session session = getSession();
+		Transaction tx = null;
+		br.ufpr.bean.Class retorno = null;
+
 		try {
-			return (br.ufpr.bean.Class) criteria.list().get(0);
+			tx = session.beginTransaction();
+			Criteria criteria = session.createCriteria(br.ufpr.bean.Class.class);
+			criteria.add(Restrictions.eq("table", table));
+			
+			try {
+				retorno = (br.ufpr.bean.Class) criteria.list().get(0);
+			}
+			catch (Exception e) {
+				retorno = null;
+			}
+			tx.commit();
 		}
-		catch (Exception e) {
-			return null;
+		catch (HibernateException e) {
+			if (tx != null) {
+				tx.rollback();
+			}
+			e.printStackTrace(); 
 		}
+		finally {
+			session.close(); 
+		}
+
+		return retorno;
 	}
 }

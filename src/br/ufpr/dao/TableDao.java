@@ -3,6 +3,9 @@ package br.ufpr.dao;
 import java.util.List;
 
 import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 
 import br.ufpr.bean.Database;
@@ -21,16 +24,35 @@ public class TableDao extends GenericDao {
 			return null;
 		}
 		
-		Criteria criteria = getSession().createCriteria(Table.class);
-		criteria.add(Restrictions.eq("database.id", databaseId));
-		criteria.add(Restrictions.eq("physicalName", physicalName));
-		
+		Session session = getSession();
+		Transaction tx = null;
+		Table retorno = null;
+
 		try {
-			return (Table) criteria.list().get(0);
+			tx = session.beginTransaction();
+			Criteria criteria = session.createCriteria(Table.class);
+			criteria.add(Restrictions.eq("database.id", databaseId));
+			criteria.add(Restrictions.eq("physicalName", physicalName));
+			
+			try {
+				retorno = (Table) criteria.list().get(0);
+			}
+			catch (Exception e) {
+				retorno = null;
+			}
+			tx.commit();
 		}
-		catch (Exception e) {
-			return null;
+		catch (HibernateException e) {
+			if (tx != null) {
+				tx.rollback();
+			}
+			e.printStackTrace(); 
 		}
+		finally {
+			session.close(); 
+		}
+
+		return retorno;
 	}
 	
 	/**
@@ -44,14 +66,34 @@ public class TableDao extends GenericDao {
 			return null;
 		}
 		
-		Criteria criteria = getSession().createCriteria(Table.class);
-		criteria.add(Restrictions.eq("database", database));
-		
+		Session session = getSession();
+		Transaction tx = null;
+		List<Table> retorno = null;
+
 		try {
-			return criteria.list();
+			tx = session.beginTransaction();
+			Criteria criteria = session.createCriteria(Table.class);
+			criteria.add(Restrictions.eq("database", database));
+			
+			try {
+				retorno = criteria.list();
+			}
+			catch (Exception e) {
+				retorno = null;
+			}
+			
+			tx.commit();
 		}
-		catch (Exception e) {
-			return null;
+		catch (HibernateException e) {
+			if (tx != null) {
+				tx.rollback();
+			}
+			e.printStackTrace(); 
 		}
+		finally {
+			session.close(); 
+		}
+
+		return retorno;
 	}
 }

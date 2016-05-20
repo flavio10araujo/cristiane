@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 
 import br.ufpr.bean.Column;
@@ -11,10 +14,29 @@ import br.ufpr.bean.Column;
 public class ColumnDao extends GenericDao {
 
 	public Column getByPhysicalName(Long tableId, String physicalName) {
-		Criteria criteria = getSession().createCriteria(Column.class);
-		criteria.add(Restrictions.eq("table.id", tableId));
-		criteria.add(Restrictions.eq("physicalName", physicalName));
-		return (Column) criteria.list().get(0);
+		Session session = getSession();
+		Transaction tx = null;
+		Column retorno = null;
+
+		try {
+			tx = session.beginTransaction();
+			Criteria criteria = session.createCriteria(Column.class);
+			criteria.add(Restrictions.eq("table.id", tableId));
+			criteria.add(Restrictions.eq("physicalName", physicalName));
+			retorno = (Column) criteria.list().get(0);
+			tx.commit();
+		}
+		catch (HibernateException e) {
+			if (tx != null) {
+				tx.rollback();
+			}
+			e.printStackTrace(); 
+		}
+		finally {
+			session.close(); 
+		}
+
+		return retorno;
 	}
 	
 	/**
@@ -28,35 +50,77 @@ public class ColumnDao extends GenericDao {
 	 * @return
 	 */
 	public List<Column> getByIndsColumncheckPrimarykeyForeignkeyUniquekey(Long databaseId, boolean indColumnCheck, boolean indPrimaryKey, boolean indForeignKey, boolean indUniqueKey) {
-		Criteria criteria = getSession().createCriteria(Column.class);
-		criteria.add(Restrictions.eq("indColumnCheck", indColumnCheck));
-		criteria.add(Restrictions.eq("primaryKey", indPrimaryKey));
-		criteria.add(Restrictions.eq("foreignKey", indForeignKey));
-		criteria.add(Restrictions.eq("uniqueKey", indUniqueKey));
-		
-		@SuppressWarnings("unchecked")
-		List<Column> columns = criteria.list();
-		
-		if (columns == null || columns.size() == 0) {
-			return null;
+		Session session = getSession();
+		Transaction tx = null;
+		List<Column> retorno = null;
+
+		try {
+			tx = session.beginTransaction();
+			Criteria criteria = session.createCriteria(Column.class);
+			criteria.add(Restrictions.eq("indColumnCheck", indColumnCheck));
+			criteria.add(Restrictions.eq("primaryKey", indPrimaryKey));
+			criteria.add(Restrictions.eq("foreignKey", indForeignKey));
+			criteria.add(Restrictions.eq("uniqueKey", indUniqueKey));
+			
+			@SuppressWarnings("unchecked")
+			List<Column> columns = criteria.list();
+			
+			if (columns == null || columns.size() == 0) {
+				retorno = null;
+			}
+			else { 
+				retorno = filterColumnsByDatabase(databaseId, columns);
+			}
+			
+			tx.commit();
 		}
-		
-		return filterColumnsByDatabase(databaseId, columns);
+		catch (HibernateException e) {
+			if (tx != null) {
+				tx.rollback();
+			}
+			e.printStackTrace(); 
+		}
+		finally {
+			session.close(); 
+		}
+
+		return retorno;
 	}
 	
 	public List<Column> getByIndDescriptionAndIndColumnCheck(Long databaseId, boolean indDescription, boolean indColumnCheck) {
-		Criteria criteria = getSession().createCriteria(Column.class);
-		criteria.add(Restrictions.eq("indDescription", indDescription));
-		criteria.add(Restrictions.eq("indColumnCheck", indColumnCheck));
-		
-		@SuppressWarnings("unchecked")
-		List<Column> columns = criteria.list();
-		
-		if (columns == null || columns.size() == 0) {
-			return null;
+		Session session = getSession();
+		Transaction tx = null;
+		List<Column> retorno = null;
+
+		try {
+			tx = session.beginTransaction();
+			Criteria criteria = session.createCriteria(Column.class);
+			criteria.add(Restrictions.eq("indDescription", indDescription));
+			criteria.add(Restrictions.eq("indColumnCheck", indColumnCheck));
+			
+			@SuppressWarnings("unchecked")
+			List<Column> columns = criteria.list();
+			
+			if (columns == null || columns.size() == 0) {
+				retorno = null;
+			}
+			else {
+				retorno = filterColumnsByDatabase(databaseId, columns);
+			}
+			
+			tx.commit();
 		}
-		
-		return filterColumnsByDatabase(databaseId, columns);
+		catch (HibernateException e) {
+			if (tx != null) {
+				tx.rollback();
+			}
+			e.printStackTrace(); 
+		}
+		finally {
+			session.close(); 
+		}
+
+		return retorno;
 	}
 	
 	public List<Column> filterColumnsByDatabase(Long databaseId, List<Column> columns) {
@@ -73,44 +137,106 @@ public class ColumnDao extends GenericDao {
 	}
 	
 	public List<Column> getByIndPrimarykey(Long databaseId, boolean indPrimaryKey) {
-		Criteria criteria = getSession().createCriteria(Column.class);
-		criteria.add(Restrictions.eq("primaryKey", indPrimaryKey));
-		
-		@SuppressWarnings("unchecked")
-		List<Column> columns = criteria.list();
-		
-		if (columns == null || columns.size() == 0) {
-			return null;
+		Session session = getSession();
+		Transaction tx = null;
+		List<Column> retorno = null;
+
+		try {
+			tx = session.beginTransaction();
+			Criteria criteria = session.createCriteria(Column.class);
+			criteria.add(Restrictions.eq("primaryKey", indPrimaryKey));
+			
+			@SuppressWarnings("unchecked")
+			List<Column> columns = criteria.list();
+			
+			if (columns == null || columns.size() == 0) {
+				retorno = null;
+			}
+			else {
+				retorno = filterColumnsByDatabase(databaseId, columns);
+			}
+			
+			tx.commit();
 		}
-		
-		return filterColumnsByDatabase(databaseId, columns);
+		catch (HibernateException e) {
+			if (tx != null) {
+				tx.rollback();
+			}
+			e.printStackTrace(); 
+		}
+		finally {
+			session.close(); 
+		}
+
+		return retorno;
 	}
 	
 	public List<Column> getByIndForeignkey(Long databaseId, boolean indForeignKey) {
-		Criteria criteria = getSession().createCriteria(Column.class);
-		criteria.add(Restrictions.eq("foreignKey", indForeignKey));
-		
-		@SuppressWarnings("unchecked")
-		List<Column> columns = criteria.list();
-		
-		if (columns == null || columns.size() == 0) {
-			return null;
+		Session session = getSession();
+		Transaction tx = null;
+		List<Column> retorno = null;
+
+		try {
+			tx = session.beginTransaction();
+			Criteria criteria = session.createCriteria(Column.class);
+			criteria.add(Restrictions.eq("foreignKey", indForeignKey));
+			
+			@SuppressWarnings("unchecked")
+			List<Column> columns = criteria.list();
+			
+			if (columns == null || columns.size() == 0) {
+				retorno = null;
+			}
+			else {
+				retorno = filterColumnsByDatabase(databaseId, columns);
+			}
+			
+			tx.commit();
 		}
-		
-		return filterColumnsByDatabase(databaseId, columns);
+		catch (HibernateException e) {
+			if (tx != null) {
+				tx.rollback();
+			}
+			e.printStackTrace(); 
+		}
+		finally {
+			session.close(); 
+		}
+
+		return retorno;
 	}
 	
 	public Column getByIndPrimaryKeyTableAndId(Column column) {
-		Criteria criteria = getSession().createCriteria(Column.class);
-		criteria.add(Restrictions.eq("primaryKey", column.isPrimaryKey()));
-		criteria.add(Restrictions.eq("table.id", column.getTable().getId()));
-		criteria.add(Restrictions.ne("id", column.getId()));
-		
+		Session session = getSession();
+		Transaction tx = null;
+		Column retorno = null;
+
 		try {
-			return (Column) criteria.list().get(0);
+			tx = session.beginTransaction();
+			Criteria criteria = session.createCriteria(Column.class);
+			criteria.add(Restrictions.eq("primaryKey", column.isPrimaryKey()));
+			criteria.add(Restrictions.eq("table.id", column.getTable().getId()));
+			criteria.add(Restrictions.ne("id", column.getId()));
+			
+			try {
+				retorno = (Column) criteria.list().get(0);
+			}
+			catch(Exception e) {
+				retorno = null;
+			}
+			
+			tx.commit();
 		}
-		catch(Exception e) {
-			return null;
+		catch (HibernateException e) {
+			if (tx != null) {
+				tx.rollback();
+			}
+			e.printStackTrace(); 
 		}
+		finally {
+			session.close(); 
+		}
+
+		return retorno;
 	}
 }

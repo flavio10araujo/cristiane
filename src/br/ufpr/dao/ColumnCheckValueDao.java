@@ -1,6 +1,9 @@
 package br.ufpr.dao;
 
 import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 
 import br.ufpr.bean.Column;
@@ -13,14 +16,33 @@ public class ColumnCheckValueDao extends GenericDao {
 			return null;
 		}
 		
-		Criteria criteria = getSession().createCriteria(ColumnCheckValue.class);
-		criteria.add(Restrictions.eq("column", column));
-		
+		Session session = getSession();
+		Transaction tx = null;
+		ColumnCheckValue retorno = null;
+
 		try {
-			return (ColumnCheckValue) criteria.list().get(0);
+			tx = session.beginTransaction();
+			Criteria criteria = session.createCriteria(ColumnCheckValue.class);
+			criteria.add(Restrictions.eq("column", column));
+			
+			try {
+				retorno = (ColumnCheckValue) criteria.list().get(0);
+			}
+			catch (Exception e) {
+				retorno = null;
+			}
+			tx.commit();
 		}
-		catch (Exception e) {
-			return null;
+		catch (HibernateException e) {
+			if (tx != null) {
+				tx.rollback();
+			}
+			e.printStackTrace(); 
 		}
+		finally {
+			session.close(); 
+		}
+
+		return retorno;
 	}
 }

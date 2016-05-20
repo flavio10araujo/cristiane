@@ -3,6 +3,9 @@ package br.ufpr.dao;
 import java.sql.SQLException;
 
 import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 
 import br.ufpr.bean.Database;
@@ -10,15 +13,53 @@ import br.ufpr.bean.Database;
 public class DatabaseDao extends GenericDao {
 	
 	public Database get(Long id){
-		Criteria criteria = getSession().createCriteria(Database.class);
-		criteria.add(Restrictions.eq("id", id));
-		return (Database) criteria.list().get(0);
+		Session session = getSession();
+		Transaction tx = null;
+		Database retorno = null;
+
+		try {
+			tx = session.beginTransaction();
+			Criteria criteria = session.createCriteria(Database.class);
+			criteria.add(Restrictions.eq("id", id));
+			retorno = (Database) criteria.list().get(0);
+			tx.commit();
+		}
+		catch (HibernateException e) {
+			if (tx != null) {
+				tx.rollback();
+			}
+			e.printStackTrace(); 
+		}
+		finally {
+			session.close(); 
+		}
+
+		return retorno;
 	}
 
 	public Database getByName(String name){
-		Criteria criteria = getSession().createCriteria(Database.class);
-		criteria.add(Restrictions.eq("name", name));
-		return (Database) criteria.list().get(0);
+		Session session = getSession();
+		Transaction tx = null;
+		Database retorno = null;
+
+		try {
+			tx = session.beginTransaction();
+			Criteria criteria = session.createCriteria(Database.class);
+			criteria.add(Restrictions.eq("name", name));
+			retorno = (Database) criteria.list().get(0);
+			tx.commit();
+		}
+		catch (HibernateException e) {
+			if (tx != null) {
+				tx.rollback();
+			}
+			e.printStackTrace(); 
+		}
+		finally {
+			session.close(); 
+		}
+
+		return retorno;
 	}
 	
 	public void cleanDataBase() throws SQLException {

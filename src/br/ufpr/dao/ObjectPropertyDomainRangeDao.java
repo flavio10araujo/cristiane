@@ -1,6 +1,9 @@
 package br.ufpr.dao;
 
 import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 
 import br.ufpr.bean.ObjectProperty;
@@ -13,14 +16,34 @@ public class ObjectPropertyDomainRangeDao extends GenericDao {
 			return null;
 		}
 		
-		Criteria criteria = getSession().createCriteria(ObjectPropertyDomainRange.class);
-		criteria.add(Restrictions.eq("objectProperty", objectProperty));
-		
+		Session session = getSession();
+		Transaction tx = null;
+		ObjectPropertyDomainRange retorno = null;
+
 		try {
-			return (ObjectPropertyDomainRange) criteria.list().get(0);
+			tx = session.beginTransaction();
+			Criteria criteria = session.createCriteria(ObjectPropertyDomainRange.class);
+			criteria.add(Restrictions.eq("objectProperty", objectProperty));
+			
+			try {
+				retorno = (ObjectPropertyDomainRange) criteria.list().get(0);
+			}
+			catch (Exception e) {
+				retorno = null;
+			}
+			
+			tx.commit();
 		}
-		catch (Exception e) {
-			return null;
+		catch (HibernateException e) {
+			if (tx != null) {
+				tx.rollback();
+			}
+			e.printStackTrace(); 
 		}
+		finally {
+			session.close(); 
+		}
+
+		return retorno;
 	}
 }
