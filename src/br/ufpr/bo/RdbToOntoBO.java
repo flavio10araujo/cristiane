@@ -1046,7 +1046,7 @@ public class RdbToOntoBO {
 				// PASSO 34
 				if ("C".equals(table.getDescription())) {
 					br.ufpr.bean.Class c = new br.ufpr.bean.Class();
-					String name = "h" + Util.funcaoForImportRecords(record.getColumnvalues()); // PASSO 35
+					String name = "h" + Util.functionForImportRecords(record.getColumnvalues()); // PASSO 35
 					c.setName(name);
 					c.setOntology(ontology);
 					c.setRecord(record);
@@ -1061,7 +1061,7 @@ public class RdbToOntoBO {
 				// PASSO 37
 				else {
 					Instance newIntance = new Instance();
-					String description = "i" + Util.funcaoForImportRecords(record.getColumnvalues()); // PASSO 37
+					String description = "i" + Util.functionForImportRecords(record.getColumnvalues()); // PASSO 37
 					newIntance.setDescription(description);
 					newIntance.setClazz(classDao.getByTable(table));
 					newIntance.setOntology(ontology);

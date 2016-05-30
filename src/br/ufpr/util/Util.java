@@ -7,9 +7,10 @@ public class Util {
 	/*public static void main(String[] Args) {
 		//System.out.println(funcaoMaiuscula("01_Cadastros básicos do sistema"));
 		//System.out.println(funcaoMinuscula("01_Cadastros básicos do sistema"));
-		System.out.println(funcaoForImportRecords("[1, Procedimentos Cirurgicos]"));
-		System.out.println(funcaoForImportRecords("[1,  Procedimentos Cirurgicos]"));
-		System.out.println(funcaoForImportRecords("[1,Procedimentos Cirurgicos]"));
+		//System.out.println(funcaoForImportRecords("[1, Procedimentos Cirurgicos]"));
+		//System.out.println(funcaoForImportRecords("[1,  Procedimentos Cirurgicos]"));
+		//System.out.println(funcaoForImportRecords("[1,Procedimentos Cirurgicos]"));
+		System.out.println(functionForInverseObjectProperties("temRestricaoSexo"));
 	}*/
 	
 	/**
@@ -120,7 +121,7 @@ public class Util {
 	 * @param str
 	 * @return
 	 */
-	public static String funcaoForImportRecords(String str) {
+	public static String functionForImportRecords(String str) {
 		if (str == null || "".equals(str)) {
 			return "";
 		}
@@ -143,6 +144,25 @@ public class Util {
 				str += "_" + funcaoMaiuscula(strArr[i].trim());
 			}
 		}
+		
+		return str;
+	}
+	
+	/**
+	 * Função específica para o método DownloadOWLFileBO.setObjectProperty.
+	 * Deve apterar uma String conforme o exemplo:
+	 * De: temRestricaoSexo
+	 * Para: eRestricaoSexoDe
+	 * 
+	 * @param str
+	 * @return
+	 */
+	public static String functionForInverseObjectProperties(String str) {
+		if (str == null || "".equals(str)) {
+			return "";
+		}
+		
+		str = "e" + str.substring(3) + "De";
 		
 		return str;
 	}

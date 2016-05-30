@@ -16,6 +16,7 @@ import br.ufpr.dao.HierarchyDao;
 import br.ufpr.dao.InstanceDao;
 import br.ufpr.dao.ObjectPropertyDao;
 import br.ufpr.dao.ObjectPropertyDomainRangeDao;
+import br.ufpr.util.Util;
 
 public class DownloadOWLFileBO {
 
@@ -47,23 +48,6 @@ public class DownloadOWLFileBO {
 	
 	public StringBuffer createOWLHeader() {
 		StringBuffer header = new StringBuffer();
-		
-		/*header.append("<?xml version=\"1.0\"?>"
-				+ "<!DOCTYPE rdf:RDF ["
-				+ "<!ENTITY owl \"http://www.w3.org/2002/07/owl#\" >"
-				+ "<!ENTITY xsd \"http://www.w3.org/2001/XMLSchema#\" >"
-				+ "<!ENTITY rdfs \"http://www.w3.org/2000/01/rdf-schema#\" >"
-				+ "<!ENTITY rdf \"http://www.w3.org/1999/02/22-rdf-syntax-ns#\" >"
-				+ "<!ENTITY untitled-ontology-131 \"http://www.semanticweb.org/alex/ontologies/2015/3/untitled-ontology-131#\" >"
-				+ "]>"
-				+ "<rdf:RDF xmlns=\"http://www.semanticweb.org/alex/ontologies/2015/3/untitled-ontology-131#\" "
-				+ "xml:base=\"http://www.semanticweb.org/alex/ontologies/2015/3/untitled-ontology-131\" "
-				+ "xmlns:untitled-ontology-131=\"http://www.semanticweb.org/alex/ontologies/2015/3/untitled-ontology-131#\" "
-				+ "xmlns:rdfs=\"http://www.w3.org/2000/01/rdf-schema#\" "
-				+ "xmlns:owl=\"http://www.w3.org/2002/07/owl#\" "
-				+ "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema#\" "
-				+ "xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">");*/
-		
 		header.append("<?xml version=\"1.0\"?>"
 				+ "<Ontology xmlns=\"http://www.w3.org/2002/07/owl#\" "
 				+ "xml:base=\"http://www.semanticweb.org/home/ontologies/2016/4/untitled-ontology-24\" "
@@ -83,7 +67,6 @@ public class DownloadOWLFileBO {
 	
 	public StringBuffer createOWLFooter() {
 		StringBuffer footer = new StringBuffer();
-		//footer.append("</rdf:RDF>");
 		footer.append("</Ontology>");
 		return footer;
 	}
@@ -91,7 +74,7 @@ public class DownloadOWLFileBO {
 	public StringBuffer setDeclaration() {
 		StringBuffer file = new StringBuffer();
 		
-		// Deve ser gerada uma Classe para todos os registros da T011.		
+		// Deve ser gerada uma Classe para todos os registros da T011.
 		//file.append("<Declaration><Class IRI=\"#universityStudent\" /></Declaration>");
 		List<br.ufpr.bean.Class> classList = classDao.listAll();
 		
@@ -160,13 +143,21 @@ public class DownloadOWLFileBO {
     	DatatypePropertyDomain datatypePropertyDomain = null; 
     	
     	for (DatatypeProperty datatypeProperty : datatypePropertyList) {
+    		//file.append("<Declaration><DataProperty IRI=\"#matricula_aluno\" /></Declaration>");
+    		file.append("<Declaration><DataProperty IRI=\"#");file.append(datatypeProperty.getDescription());file.append("\" /></Declaration>");
+    		
     		file.append("<DataPropertyDomain>");
     		file.append("<DataProperty IRI=\"#");file.append(datatypeProperty.getDescription());file.append("\" />");
-    		
     		datatypePropertyDomain = datatypePropertyDomainDao.getByDatatypePropertyID(datatypeProperty.getId()).get(0);
     		file.append("<Class IRI=\"#");file.append(datatypePropertyDomain.getClassDomain().getName());file.append("\" />");
-    		
     		file.append("</DataPropertyDomain>");
+    		
+    		//file.append("<DataPropertyRange><DataProperty IRI=\"#matricula_aluno\" /><Datatype abbreviatedIRI=\"xsd:integer\" /></DataPropertyRange>");
+    		file.append("<DataPropertyRange><DataProperty IRI=\"#");
+    		file.append(datatypeProperty.getDescription());
+    		file.append("\" /><Datatype abbreviatedIRI=\"xsd:");
+    		file.append(datatypeProperty.getDatatypeOnto().getDescription());
+    		file.append("\" /></DataPropertyRange>");
     	}
 		
 		return file;
@@ -174,6 +165,7 @@ public class DownloadOWLFileBO {
 	
 	public StringBuffer setDataPropertyDomain02() {
 		StringBuffer file = new StringBuffer();
+		StringBuffer file02 = new StringBuffer();
 		
 		// Para os registros da T013, em que (C013_IND_COMMON_CONCEPT = 1), o resultado da pesquisa na T014 retorne mais que 1 resultado.
 		//file.append("<DataPropertyDomain><DataProperty IRI=\"#primeiro_nome\" /><ObjectUnionOf><Class IRI=\"#Pessoa\" /><Class IRI=\"#Portugues\" /></ObjectUnionOf></DataPropertyDomain>");
@@ -188,12 +180,24 @@ public class DownloadOWLFileBO {
     		datatypePropertyDomainList = datatypePropertyDomainDao.getByDatatypePropertyID(datatypeProperty.getId());
     		for (DatatypePropertyDomain datatypePropertyDomain : datatypePropertyDomainList) {
     			file.append("<Class IRI=\"#");file.append(datatypePropertyDomain.getClassDomain().getName());file.append("\" />");
+    			
+    			//file02.append("<Declaration><DataProperty IRI=\"#primeiro_nome\" /></Declaration>");
+    			file02.append("<Declaration><DataProperty IRI=\"#");file02.append(datatypePropertyDomain.getClassDomain().getName());file02.append("\" /></Declaration>");
     		}
     		
     		file.append("</ObjectUnionOf>");
     		file.append("</DataPropertyDomain>");
+    		
+    		//file.append("<DataPropertyRange><DataProperty IRI=\"#primeiro_nome\" /><Datatype abbreviatedIRI=\"xsd:strinh\" /></DataPropertyRange>");
+    		file.append("<DataPropertyRange><DataProperty IRI=\"#");
+    		file.append(datatypeProperty.getDescription());
+    		file.append("\" /><Datatype abbreviatedIRI=\"xsd:");
+    		file.append(datatypeProperty.getDatatypeOnto().getDescription());
+    		file.append("\" /></DataPropertyRange>");
     	}
 
+		file.append(file02);
+		
 		return file;
 	}
 	
@@ -209,6 +213,16 @@ public class DownloadOWLFileBO {
     		file.append("<DataProperty IRI=\"#");file.append(datatypeProperty.getDescription());file.append("\" />");
     		file.append("<Class IRI=\"#Thing\" />");
     		file.append("</DataPropertyDomain>");
+    		
+    		//file.append("<Declaration><DataProperty IRI=\"#descricao\" /></Declaration>");
+    		file.append("<Declaration><DataProperty IRI=\"#");file.append(datatypeProperty.getDescription());file.append("\" /></Declaration>");
+    		
+    		//file.append("<DataPropertyRange><DataProperty IRI=\"#descricao\" /><Datatype abbreviatedIRI=\"xsd:string\" /></DataPropertyRange>");
+    		file.append("<DataPropertyRange><DataProperty IRI=\"#");
+    		file.append(datatypeProperty.getDescription());
+    		file.append("\" /><Datatype abbreviatedIRI=\"xsd:");
+    		file.append(datatypeProperty.getDatatypeOnto().getDescription());
+    		file.append("\" /></DataPropertyRange>");
     	}
 		
 		List<DatatypePropertyDomain> datatypePropertyDomainList = null; 
@@ -218,6 +232,9 @@ public class DownloadOWLFileBO {
     		datatypePropertyDomainList = datatypePropertyDomainDao.getByDatatypePropertyID(datatypeProperty.getId());
     		
     		for (DatatypePropertyDomain datatypePropertyDomain : datatypePropertyDomainList) {
+    			//file.append("<Declaration><DataProperty IRI=\"#descricao_grupo\" /></Declaration>");
+    			file.append("<Declaration><DataProperty IRI=\"#");file.append(datatypeProperty.getDescription() + "_" + datatypePropertyDomain.getClassDomain().getName());file.append("\" /></Declaration>");
+    			
     			file.append("<DataPropertyDomain>");
         		file.append("<DataProperty IRI=\"#");file.append(datatypeProperty.getDescription() + "_" + datatypePropertyDomain.getClassDomain().getName());file.append("\" />");
     			file.append("<Class IRI=\"#");file.append(datatypePropertyDomain.getClassDomain().getName());file.append("\" />");
@@ -227,6 +244,13 @@ public class DownloadOWLFileBO {
     			file.append("<DataProperty IRI=\"#");file.append(datatypeProperty.getDescription() + "_" + datatypePropertyDomain.getClassDomain().getName());file.append("\" />");
     			file.append("<DataProperty IRI=\"#");file.append(datatypeProperty.getDescription());file.append("\" />");
     			file.append("</SubDataPropertyOf>");
+    			
+    			//file.append("<DataPropertyRange><DataProperty IRI=\"#descricao_Grupo\" /><Datatype abbreviatedIRI=\"xsd:string\" /></DataPropertyRange>");
+    			file.append("<DataPropertyRange><DataProperty IRI=\"#");
+    			file.append(datatypeProperty.getDescription() + "_" + datatypePropertyDomain.getClassDomain().getName());
+    			file.append("\" /><Datatype abbreviatedIRI=\"xsd:");
+    			file.append("string");
+    			file.append("\" /></DataPropertyRange>");
     		}
     	}
 		
@@ -235,11 +259,20 @@ public class DownloadOWLFileBO {
 	
 	public StringBuffer setObjectProperty() {
 		StringBuffer file = new StringBuffer();
+		file.append(setObjectProperty01()); 
+		file.append(setObjectProperty02());
+		return file;
+	}
+	
+	public StringBuffer setObjectProperty01() {
+		StringBuffer file = new StringBuffer();
+		
+		// C019_IND_INVERSE_FUNCTIONAL = 0
 		
 		//file.append("<Declaration><ObjectProperty IRI=\"#leciona\"/></Declaration>");
 		//file.append("<ObjectPropertyDomain><ObjectProperty IRI=\"#leciona\" /><Class IRI=\"#Professor\" /></ObjectPropertyDomain>");
 		//file.append("<ObjectPropertyRange><ObjectProperty IRI=\"#leciona\" /><Class IRI=\"#Modulo\" /></ObjectPropertyRange>");
-		List<ObjectProperty> objectPropertyList = objectPropertyDao.listAll();
+		List<ObjectProperty> objectPropertyList = objectPropertyDao.getByIndInverseFunctional(false);
 		ObjectPropertyDomainRange objectPropertyDomainRange = null;
 		
 		for (ObjectProperty objectProperty : objectPropertyList) {
@@ -248,25 +281,109 @@ public class DownloadOWLFileBO {
 			file.append(objectProperty.getDescription());
 			file.append("\"/></Declaration>");
 			
+			//file.append("<InverseObjectProperties><ObjectProperty IRI=\"#temRestricaoSexo\" /><ObjectProperty IRI=\"#eRestricaoSexoDe\" /></InverseObjectProperties>");
+			file.append("<InverseObjectProperties><ObjectProperty IRI=\"#");
+			file.append(objectProperty.getDescription());
+			file.append("\" /><ObjectProperty IRI=\"#");
+			file.append(Util.functionForInverseObjectProperties(objectProperty.getDescription()));
+			file.append("\" /></InverseObjectProperties>");
+			
+			//file.append("<Declaration><ObjectProperty IRI=\"#eRestricaoSexoDe\" /></Declaration>");
+			file.append("<Declaration><ObjectProperty IRI=\"#");
+			file.append(Util.functionForInverseObjectProperties(objectProperty.getDescription()));
+			file.append("\" /></Declaration>");
+			
 			objectPropertyDomainRange = objectPropertyDomainRangeDao.findByObjectProperty(objectProperty);
 			
 			//TODO - retirar esse IF depois de terminar o passo 31
 			if (objectPropertyDomainRange.getClassDomain() != null) {
-			file.append("<ObjectPropertyDomain>");
-			file.append("<ObjectProperty IRI=\"#");
+			file.append("<ObjectPropertyDomain><ObjectProperty IRI=\"#");
 			file.append(objectProperty.getDescription());
 			file.append("\" /><Class IRI=\"#");
 			file.append(objectPropertyDomainRange.getClassDomain().getName());
 			file.append("\" /></ObjectPropertyDomain>");
+			
+			//file.append("<ObjectPropertyDomain><ObjectProperty IRI=\"#eRestricaoSexoDe\" /><Class IRI=\"#Sexo\" /></ObjectPropertyDomain>");
+			file.append("<ObjectPropertyDomain><ObjectProperty IRI=\"#");
+			file.append(Util.functionForInverseObjectProperties(objectProperty.getDescription()));
+			file.append("\" /><Class IRI=\"#");
+			file.append(objectPropertyDomainRange.getClassRange().getName());
+			file.append("\" /></ObjectPropertyDomain>");
 			}
 			
 			if (objectPropertyDomainRange.getClassRange() != null) {
-				file.append("<ObjectPropertyRange>");
-				file.append("<ObjectProperty IRI=\"#");
+				
+				// Se C019_MIN_CARDINALITY = 0
+				if (!objectProperty.getMinCardinality()) {
+					file.append("<ObjectPropertyRange><ObjectProperty IRI=\"#");
+					file.append(objectProperty.getDescription());
+					file.append("\" /><Class IRI=\"#");
+					file.append(objectPropertyDomainRange.getClassRange().getName());
+					file.append("\" /></ObjectPropertyRange>");
+					
+					//file.append("<ObjectPropertyRange><ObjectProperty IRI=\"#eRestricaoSexoDe\" /><Class IRI=\"#eCid\" /></ObjectPropertyRange>");
+					file.append("<ObjectPropertyRange><ObjectProperty IRI=\"#");
+					file.append(Util.functionForInverseObjectProperties(objectProperty.getDescription()));
+					file.append("\" /><Class IRI=\"#");
+					file.append(objectPropertyDomainRange.getClassDomain().getName());
+					file.append("\" /></ObjectPropertyRange>");
+				}
+				// Se C019_MIN_CARDINALITY = 1
+				else {
+					//file.append("<ObjectPropertyRange><ObjectProperty IRI=\"#temCodigodoProcedimento\" /><ObjectMinCardinality cardinality=\"1\"><ObjectProperty IRI=\"#temCodigodoProcedimento\" /><Class IRI=\"#eProcedimento\" /></ObjectMinCardinality></ObjectPropertyRange>");
+					file.append("<ObjectPropertyRange><ObjectProperty IRI=\"#");
+					file.append(objectProperty.getDescription());
+					file.append("\" /><ObjectMinCardinality cardinality=\"1\"><ObjectProperty IRI=\"#");
+					file.append(objectProperty.getDescription());
+					file.append("\" /><Class IRI=\"#");
+					file.append(objectPropertyDomainRange.getClassRange().getName());
+					file.append("\" /></ObjectMinCardinality></ObjectPropertyRange>");
+					
+					file.append("<ObjectPropertyRange><ObjectProperty IRI=\"#");
+					file.append(objectProperty.getDescription());
+					file.append("\" /><ObjectMinCardinality cardinality=\"1\"><ObjectProperty IRI=\"#");
+					file.append(Util.functionForInverseObjectProperties(objectProperty.getDescription()));
+					file.append("\" /><Class IRI=\"#");
+					file.append(objectPropertyDomainRange.getClassRange().getName());
+					file.append("\" /></ObjectMinCardinality></ObjectPropertyRange>");
+				}
+			}
+		}
+		
+		return file;
+	}
+	
+	public StringBuffer setObjectProperty02() {
+		StringBuffer file = new StringBuffer();
+		
+		// C019_IND_INVERSE_FUNCTIONAL = 1
+		
+		List<ObjectProperty> objectPropertyList = objectPropertyDao.getByIndInverseFunctional(true);
+		ObjectPropertyDomainRange objectPropertyDomainRange = null;
+		
+		for (ObjectProperty objectProperty : objectPropertyList) {
+		
+			//file.append("<Declaration><ObjectProperty IRI=\"#PKCodigodoProcedimento\" /></Declaration>");
+			file.append("<Declaration><ObjectProperty IRI=\"#");
+			file.append(objectProperty.getDescription());
+			file.append("\"/></Declaration>");
+	
+			//file.append("<InverseFunctionalObjectProperty><ObjectProperty IRI=\"#PKCodigodoProcedimento\" /></InverseFunctionalObjectProperty>");
+			file.append("<InverseFunctionalObjectProperty><ObjectProperty IRI=\"#");
+			file.append(objectProperty.getDescription());
+			file.append("\"/></InverseFunctionalObjectProperty>");
+	
+			objectPropertyDomainRange = objectPropertyDomainRangeDao.findByObjectProperty(objectProperty);		
+			
+			if (objectPropertyDomainRange.getClassRange() != null) {
+				//file.append("<ObjectPropertyRange><ObjectProperty IRI=\"#PKCodigodoProcedimento\" /><ObjectMinCardinality cardinality=\"1\"><ObjectProperty IRI=\"#PKCodigodoProcedimento\" /><Class IRI=\"#eProcedimento\" /></ObjectMinCardinality></ObjectPropertyRange>");
+				file.append("<ObjectPropertyRange><ObjectProperty IRI=\"#");
+				file.append(objectProperty.getDescription());
+				file.append("\" /><ObjectMinCardinality cardinality=\"1\"><ObjectProperty IRI=\"#");
 				file.append(objectProperty.getDescription());
 				file.append("\" /><Class IRI=\"#");
 				file.append(objectPropertyDomainRange.getClassRange().getName());
-				file.append("\" /></ObjectPropertyRange>");
+				file.append("\" /></ObjectMinCardinality></ObjectPropertyRange>");
 			}
 		}
 		
