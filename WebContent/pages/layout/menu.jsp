@@ -3,7 +3,7 @@
 
 <script type="text/javascript">
 function goToPage(page){
-	window.location.href = "<html:rewrite page='/" + page + ".do'/>";
+	window.location.href="<html:rewrite page='/" + page + ".do' />";
 }
 $(document).ready(function(){
 	$(".navbar-nav li").removeClass("active");
@@ -28,7 +28,7 @@ $(document).ready(function(){
 					data-toggle="dropdown" href="#"><bean:message key="label.template" /><span class="caret"></span></a>
 					<ul class="dropdown-menu">
 						<li><a href="#"><bean:message key="label.database.structure" /></a></li>
-						<li><a href="#"><bean:message key="label.database.records" /></a></li>
+						<!--<li><a href="#"><bean:message key="label.database.records" /></a></li>-->
 					</ul>
 				</li>
 				<li class="dropdown"><a class="dropdown-toggle"

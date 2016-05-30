@@ -5,15 +5,18 @@ import java.text.Normalizer;
 public class Util {
 
 	/*public static void main(String[] Args) {
-		System.out.println(funcaoMaiuscula("01_Cadastros b·sicos do sistema"));
-		System.out.println(funcaoMinuscula("01_Cadastros b·sicos do sistema"));
+		//System.out.println(funcaoMaiuscula("01_Cadastros b√°sicos do sistema"));
+		//System.out.println(funcaoMinuscula("01_Cadastros b√°sicos do sistema"));
+		System.out.println(funcaoForImportRecords("[1, Procedimentos Cirurgicos]"));
+		System.out.println(funcaoForImportRecords("[1,  Procedimentos Cirurgicos]"));
+		System.out.println(funcaoForImportRecords("[1,Procedimentos Cirurgicos]"));
 	}*/
 	
 	/**
-	 * FunÁ„o para remover acentos, espaÁos em branco, preposiÁıes e formar uma ˙nica palavra com as primeiras letras em mai˙sculo.
-	 * Ex.: Cadastros b·sicos do sistema -> CadastrosBasicosSistema
-	 * AlteraÁ„o: remover tambÈm os n˙meros e sinal de underline.
-	 * Ex.: 01_Cadastros b·sicos do sistema -> CadastrosBasicosSistema
+	 * Fun√ß√£o para remover acentos, espa√ßos em branco, preposi√ß√µes e formar uma √∫nica palavra com as primeiras letras em mai√∫sculo.
+	 * Ex.: Cadastros b√°sicos do sistema -> CadastrosBasicosSistema
+	 * Altera√ß√£o: remover tamb√©m os n√∫meros e sinal de underline.
+	 * Ex.: 01_Cadastros b√°sicos do sistema -> CadastrosBasicosSistema
 	 * 
 	 * @param str
 	 * @return
@@ -40,9 +43,9 @@ public class Util {
 	}
 	
 	/**
-	 * FunÁ„o para remover acentos, espaÁos em branco, preposiÁıes e formar uma ˙nica palavra com as primeiras letras em mai˙sculo.
-	 * PorÈm a primeira letra da primeira palavra deve ser min˙scula.
-	 * Ex.: Cadastros b·sicos do sistema -> cadastrosBasicosSistema
+	 * Fun√ß√£o para remover acentos, espa√ßos em branco, preposi√ß√µes e formar uma √∫nica palavra com as primeiras letras em mai√∫sculo.
+	 * Por√©m a primeira letra da primeira palavra deve ser min√∫scula.
+	 * Ex.: Cadastros b√°sicos do sistema -> cadastrosBasicosSistema
 	 * 
 	 * @param str
 	 * @return
@@ -105,6 +108,42 @@ public class Util {
 		
 		str = str.replaceAll("[0-9]", ""); // Remove all the numbers.
 		str = str.replaceAll("_", "");
+		return str;
+	}
+	
+	/**
+	 * Fun√ß√£o espec√≠fica para o m√©todo RdbToOntoBO.importRecords.
+	 * Deve alterar uma String conforme o exemplo:
+	 * De: [1, Procedimentos Cirurgicos]
+	 * Para: _1_Procedimentos_Cirurgicos
+	 * 
+	 * @param str
+	 * @return
+	 */
+	public static String funcaoForImportRecords(String str) {
+		if (str == null || "".equals(str)) {
+			return "";
+		}
+		
+		str = str.replaceAll("\\[", "").replaceAll("\\]","").replaceAll(",", " ");
+		
+		String[] strArr = str.split(" ");
+		str = "";
+		
+		for (int i = 0; i < strArr.length; i++) {
+			if ("".equals(strArr[i].trim())) {
+				continue;
+			}
+			
+			try {
+				Integer.parseInt(strArr[i]);
+				str += "_" + strArr[i].trim();
+			}
+			catch (NumberFormatException e) {
+				str += "_" + funcaoMaiuscula(strArr[i].trim());
+			}
+		}
+		
 		return str;
 	}
 }

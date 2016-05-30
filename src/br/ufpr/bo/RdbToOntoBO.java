@@ -22,6 +22,7 @@ import br.ufpr.bean.Instance;
 import br.ufpr.bean.ObjectProperty;
 import br.ufpr.bean.ObjectPropertyDomainRange;
 import br.ufpr.bean.Ontology;
+import br.ufpr.bean.Record;
 import br.ufpr.bean.Table;
 import br.ufpr.bean.TableDatabaseDomain;
 import br.ufpr.dao.CheckSubjectDao;
@@ -42,6 +43,7 @@ import br.ufpr.dao.InstanceDao;
 import br.ufpr.dao.ObjectPropertyDao;
 import br.ufpr.dao.ObjectPropertyDomainRangeDao;
 import br.ufpr.dao.OntologyDao;
+import br.ufpr.dao.RecordDao;
 import br.ufpr.dao.TableDao;
 import br.ufpr.dao.TableDatabaseDomainDao;
 import br.ufpr.form.RdbToOntoForm;
@@ -69,6 +71,7 @@ public class RdbToOntoBO {
 	ColumnToObjectPropertyDao columnToObjectPropertyDao = new ColumnToObjectPropertyDao();
 	ObjectPropertyDomainRangeDao objectPropertyDomainRangeDao = new ObjectPropertyDomainRangeDao();
 	DatatypePropertyDomainDao datatypePropertyDomainDao = new DatatypePropertyDomainDao();
+	RecordDao recordDao = new RecordDao();
 
 	/**
 	 * 
@@ -142,6 +145,15 @@ public class RdbToOntoBO {
 		try {
 			// Chama a função que importa os valores nas tabelas T019, T021 e T022.
 			importObjectProperty(database, ontology); // PASSO 18.1, PASSO 18.2, PASSO 22, PASSO 27
+		}
+		catch (Exception e1) {
+			e1.printStackTrace();
+			return null;
+		}
+		
+		try {
+			// Chama a função que importa as instâncias na T004.
+			importRecords(form, database, ontology); // PASSO 33
 		}
 		catch (Exception e1) {
 			e1.printStackTrace();
@@ -403,16 +415,16 @@ public class RdbToOntoBO {
 	 */
 	public void importClass(Database database, Ontology ontology) {
 		// Chama a função que importa a class Thing na T011.
-		br.ufpr.bean.Class clazz = importClassThing(ontology); // PASSO 3.2
+		//br.ufpr.bean.Class clazz = importClassThing(ontology); // PASSO 3.2
 
 		// Chama a função que importa os valores de database domain (T008) na T011.
-		importClassDatabaseDomain(database, clazz, ontology); // PASSO 3.5, PASSO 3.5a, PASSO 3.6
+		//importClassDatabaseDomain(database, clazz, ontology); // PASSO 3.5, PASSO 3.5a, PASSO 3.6
 
 		// Chama a função que importa os valores de tables (T002) na T011.
-		importClassTable(database, clazz, ontology); // PASSO 6.1?, PASSO 6.1a, PASSO 6.1b
+		importClassTable(database, /*clazz,*/ ontology); // PASSO 6.1?, PASSO 6.1a, PASSO 6.1b, PASSO 6.2
 
 		// Chama a função que importa os valores de check subject (T007) na T011.
-		importClassCheckSubject(database, clazz, ontology); // PASSO 17.1
+		importClassCheckSubject(database, /*clazz,*/ ontology); // PASSO 17.1
 	}
 
 	/**
@@ -472,7 +484,7 @@ public class RdbToOntoBO {
 	 * @param clazz
 	 * @param ontology
 	 */
-	public void importClassTable(Database database, br.ufpr.bean.Class clazz, Ontology ontology) {
+	public void importClassTable(Database database, /*br.ufpr.bean.Class clazz,*/ Ontology ontology) {
 		List<Table> lista = tableDao.getByDatabase(database);
 
 		if (lista == null || lista.size() == 0) {
@@ -500,11 +512,11 @@ public class RdbToOntoBO {
 			c.setOntology(ontology);
 			classDao.saveOrUpdate(c); // PASSO 6.1
 
-			Hierarchy hierarchy = new Hierarchy();
+			/*Hierarchy hierarchy = new Hierarchy();
 			hierarchy.setSuperClass(clazz);
 			hierarchy.setSubClass(c);
 
-			hierarchyDao.saveOrUpdate(hierarchy); // PASSO 6.2
+			hierarchyDao.saveOrUpdate(hierarchy);*/ // PASSO 6.2
 		}
 	}
 
@@ -517,7 +529,7 @@ public class RdbToOntoBO {
 	 * @param clazz
 	 * @param ontology
 	 */
-	public void importClassCheckSubject(Database database, br.ufpr.bean.Class clazz, Ontology ontology) {
+	public void importClassCheckSubject(Database database, /*br.ufpr.bean.Class clazz,*/ Ontology ontology) {
 		// Busca todos os itens da T007.
 		List<CheckSubject> lista = checkSubjectDao.getAll();
 
@@ -542,11 +554,11 @@ public class RdbToOntoBO {
 				c.setOntology(ontology);
 				classDao.saveOrUpdate(c); // PASSO 17.1
 
-				Hierarchy hierarchy = new Hierarchy();
+				/*Hierarchy hierarchy = new Hierarchy();
 				hierarchy.setSuperClass(clazz);
 				hierarchy.setSubClass(c);
 
-				hierarchyDao.saveOrUpdate(hierarchy);
+				hierarchyDao.saveOrUpdate(hierarchy);*/ // PASSO 
 			}
 		}
 	}
@@ -782,6 +794,7 @@ public class RdbToOntoBO {
 			objectProperty.setDescription(description);
 			objectProperty.setOntology(ontology);
 			objectProperty.setMinCardinality(true); // PASSO 18.3
+			objectProperty.setIndInverseFunctional(true); // PASSO 18.4
 			
 			// Inserir na T019.
 			objectPropertyDao.saveOrUpdate(objectProperty);
@@ -794,7 +807,7 @@ public class RdbToOntoBO {
 			
 			// Inserir na T022.
 			ObjectPropertyDomainRange objectPropertyDomainRange = new ObjectPropertyDomainRange();
-			objectPropertyDomainRange.setClassDomain(classDao.getByTable(column.getTable()));
+			objectPropertyDomainRange.setClassRange(classDao.getByTable(column.getTable())); // objectPropertyDomainRange.setClassDomain(classDao.getByTable(column.getTable()));
 			
 			objectPropertyDomainRange.setObjectProperty(objectProperty);
 			
@@ -834,6 +847,7 @@ public class RdbToOntoBO {
 			objectProperty.setDescription(description);
 			objectProperty.setOntology(ontology);
 			objectProperty.setMinCardinality(true); // PASSO 18.3
+			objectProperty.setIndInverseFunctional(true); // PASSO 18.4
 			
 			// Inserir na T019.
 			objectPropertyDao.saveOrUpdate(objectProperty);
@@ -846,7 +860,7 @@ public class RdbToOntoBO {
 			
 			// Inserir na T022.
 			ObjectPropertyDomainRange objectPropertyDomainRange = new ObjectPropertyDomainRange();
-			objectPropertyDomainRange.setClassDomain(classDao.getByTable(column.getTable()));
+			objectPropertyDomainRange.setClassRange(classDao.getByTable(column.getTable())); // objectPropertyDomainRange.setClassDomain(classDao.getByTable(column.getTable()));
 			
 			objectPropertyDomainRange.setObjectProperty(objectProperty);
 			
@@ -1004,5 +1018,58 @@ public class RdbToOntoBO {
 			
 			objectPropertyDomainRangeDao.saveOrUpdate(objectPropertyDomainRange); // PASSO 31
 		}
+	}
+	
+	public void importRecords(RdbToOntoForm form, Database database, Ontology ontology) throws FileNotFoundException, IOException {
+		Scanner scanner = new Scanner(form.getDatabaseStructure().getInputStream(), "UTF-8");
+
+		while (scanner.hasNextLine()) {
+			String line = scanner.nextLine();
+
+			String[] fields = line.split(";", -1);
+
+			// Inserir as instancias.
+			if (fields[0].equals("I")) {
+				System.out.println(line);
+
+				Record record = new Record();
+				
+				record.setTableColumns(fields[23]);
+				record.setColumnvalues(fields[24]);
+				
+				Table table = tableDao.getByPhysicalName(database.getId(), fields[7]);
+				record.setTable(table);
+
+				// Cadastrando na T004.
+				recordDao.saveOrUpdate(record); // PASSO 33
+				
+				// PASSO 34
+				if ("C".equals(table.getDescription())) {
+					br.ufpr.bean.Class c = new br.ufpr.bean.Class();
+					String name = "h" + Util.funcaoForImportRecords(record.getColumnvalues()); // PASSO 35
+					c.setName(name);
+					c.setOntology(ontology);
+					c.setRecord(record);
+					classDao.saveOrUpdate(c); // PASSO 35
+					
+					Hierarchy hierarchy = new Hierarchy();
+					hierarchy.setSuperClass(classDao.getByTable(table));
+					hierarchy.setSubClass(c);
+
+					hierarchyDao.saveOrUpdate(hierarchy); // PASSO 35 
+				}
+				// PASSO 37
+				else {
+					Instance newIntance = new Instance();
+					String description = "i" + Util.funcaoForImportRecords(record.getColumnvalues()); // PASSO 37
+					newIntance.setDescription(description);
+					newIntance.setClazz(classDao.getByTable(table));
+					newIntance.setOntology(ontology);
+					instanceDao.saveOrUpdate(newIntance); // PASSO 17.2
+				}
+			}
+		}
+
+		scanner.close();
 	}
 }

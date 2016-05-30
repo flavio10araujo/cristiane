@@ -114,8 +114,8 @@ public class DownloadOWLFileBO {
 		
 		for (Hierarchy hierarchy : hierarchyList) {
 			file.append("<SubClassOf>");
-			file.append("<Class IRI=\"#");file.append(hierarchy.getSuperClass().getName());file.append("\" />");
 			file.append("<Class IRI=\"#");file.append(hierarchy.getSubClass().getName());file.append("\" />");
+			file.append("<Class IRI=\"#");file.append(hierarchy.getSuperClass().getName());file.append("\" />");
 			file.append("</SubClassOf>");
 		}
 		

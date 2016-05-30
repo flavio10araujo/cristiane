@@ -4,12 +4,12 @@
 
 <script type="text/javascript">
 	function processRdbToOnto(){
-		if($("#databaseName").val() == "" && ($("#databaseStructure").val() == "" || $("#databaseRecords").val() == "")){
+		if($("#databaseName").val()=="" && ($("#databaseStructure").val()=="" || $("#databaseRecords").val()=="")){
 			$(".alert-danger").show();
 			return;
 		}
-		var form = document.forms[0];
-		form.action = "<html:rewrite page='/ProcessRdbToOnto.do'/>";
+		var form=document.forms[0];
+		form.action="<html:rewrite page='/ProcessRdbToOnto.do' />";
 		form.submit();
 	}
 </script>
@@ -41,10 +41,10 @@
 				<html:file name="rdbToOntoForm" property="databaseStructure" styleClass="form-control" styleId="databaseStructure" />
 			</div>
 			
-			<div class="form-group">
+			<!--<div class="form-group">
 				<label for="databaseRecords"><bean:message key="label.database.records" />:</label>
 				<input type="file" class="form-control" id="databaseRecords">
-			</div>
+			</div>-->
 			
 			<button type="button" onclick="javascript: processRdbToOnto();" class="btn btn-primary"><bean:message key="button.submit" /></button>
 			
