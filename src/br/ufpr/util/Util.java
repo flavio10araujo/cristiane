@@ -4,14 +4,15 @@ import java.text.Normalizer;
 
 public class Util {
 
-	/*public static void main(String[] Args) {
+	public static void main(String[] Args) {
 		//System.out.println(funcaoMaiuscula("01_Cadastros básicos do sistema"));
 		//System.out.println(funcaoMinuscula("01_Cadastros básicos do sistema"));
-		//System.out.println(funcaoForImportRecords("[1, Procedimentos Cirurgicos]"));
-		//System.out.println(funcaoForImportRecords("[1,  Procedimentos Cirurgicos]"));
-		//System.out.println(funcaoForImportRecords("[1,Procedimentos Cirurgicos]"));
-		System.out.println(functionForInverseObjectProperties("temRestricaoSexo"));
-	}*/
+		System.out.println(functionForImportRecords("[1, Procedimentos Cirurgicos]"));
+		System.out.println(functionForImportRecords("[1,  Procedimentos Cirurgicos]"));
+		System.out.println(functionForImportRecords("[1,Procedimentos Cirurgicos]"));
+		System.out.println(functionForImportRecords("[2, Procedimentos de urgencia]"));
+		//System.out.println(functionForInverseObjectProperties("temRestricaoSexo"));
+	}
 	
 	/**
 	 * Função para remover acentos, espaços em branco, preposições e formar uma única palavra com as primeiras letras em maiúsculo.
@@ -130,6 +131,7 @@ public class Util {
 		
 		String[] strArr = str.split(" ");
 		str = "";
+		String aux = "";
 		
 		for (int i = 0; i < strArr.length; i++) {
 			if ("".equals(strArr[i].trim())) {
@@ -141,7 +143,11 @@ public class Util {
 				str += "_" + strArr[i].trim();
 			}
 			catch (NumberFormatException e) {
-				str += "_" + funcaoMaiuscula(strArr[i].trim());
+				aux = funcaoMaiuscula(strArr[i].trim());
+				
+				if (!"".equals(aux)) {
+					str += "_" + aux;
+				}
 			}
 		}
 		
