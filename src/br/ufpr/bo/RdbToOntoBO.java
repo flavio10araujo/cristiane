@@ -2,6 +2,7 @@ package br.ufpr.bo;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -135,7 +136,7 @@ public class RdbToOntoBO {
 
 		try {
 			// Chama a função que importa os valores na T013.
-			importDatatypeProperty(database, ontology); // PASSO 18, PASSO 19
+			importDatatypeProperty(database, ontology); // PASSO 19, PASSO 20
 		}
 		catch (Exception e1) {
 			e1.printStackTrace();
@@ -144,7 +145,7 @@ public class RdbToOntoBO {
 		
 		try {
 			// Chama a função que importa os valores nas tabelas T019, T021 e T022.
-			importObjectProperty(database, ontology); // PASSO 18.1, PASSO 18.2, PASSO 22, PASSO 27
+			importObjectProperty(database, ontology); // PASSO 18.1, PASSO 18.2, PASSO 22, PASSO 27, PASSO 30
 		}
 		catch (Exception e1) {
 			e1.printStackTrace();
@@ -154,6 +155,15 @@ public class RdbToOntoBO {
 		try {
 			// Chama a função que importa as instâncias na T004.
 			importRecords(form, database, ontology); // PASSO 33
+		}
+		catch (Exception e1) {
+			e1.printStackTrace();
+			return null;
+		}
+		
+		try {
+			// Os registros inseridos na T004 em que o T004.c002_table_id é T002.c002_table_type = C serão transformados em classes na T011.
+			importRecordsToClasses(form, database, ontology); // PASSO 34
 		}
 		catch (Exception e1) {
 			e1.printStackTrace();
@@ -611,10 +621,10 @@ public class RdbToOntoBO {
 	 * 
 	 */
 	public void importDatatypeProperty(Database database, Ontology ontology) {
-		// Colunas com C003_IND_DESCRIPTION = 1 AND C003_IND_COLUMN_CHECK = 0.
+		// Colunas com C003_IND_DESCRIPTION = 1 AND C003_IND_COLUMN_CHECK = 0 AND C003_IND_FOREIGN_KEY = 0.
 		importDatatypeProperty01(database, ontology); // PASSO 19
 
-		// Colunas com C003_IND_DESCRIPTION = 0 AND C003_IND_COLUMN_CHECK = 0.
+		// Colunas com C003_IND_DESCRIPTION = 0 AND C003_IND_COLUMN_CHECK = 0 AND C003_IND_FOREIGN_KEY = 0.
 		importDatatypeProperty02(database, ontology); // PASSO 20
 	}
 
@@ -624,8 +634,8 @@ public class RdbToOntoBO {
 	 * @param ontology
 	 */
 	public void importDatatypeProperty01(Database database, Ontology ontology) {
-		// Buscar todas as colunas do database passado com C003_IND_DESCRIPTION = 1 AND C003_IND_COLUMN_CHECK = 0.
-		List<Column> columns = columnDao.getByIndDescriptionAndIndColumnCheck(database.getId(), true, false);  
+		// Buscar todas as colunas do database passado com C003_IND_DESCRIPTION = 1 AND C003_IND_COLUMN_CHECK = 0 AND C003_IND_FOREIGN_KEY = 0.
+		List<Column> columns = columnDao.getByIndDescriptionAndIndColumnCheckAndIndForeignKey(database.getId(), true, false, false); 
 
 		if (columns == null || columns.size() == 0) {
 			return;
@@ -687,8 +697,8 @@ public class RdbToOntoBO {
 	 * @param ontology
 	 */
 	public void importDatatypeProperty02(Database database, Ontology ontology) {
-		// Buscar todas as colunas do database passado com C003_IND_DESCRIPTION = 0 AND C003_IND_COLUMN_CHECK = 0.
-		List<Column> columns = columnDao.getByIndDescriptionAndIndColumnCheck(database.getId(), false, false);  
+		// Buscar todas as colunas do database passado com C003_IND_DESCRIPTION = 0 AND C003_IND_COLUMN_CHECK = 0 AND C003_IND_FOREIGN_KEY = 0.
+		List<Column> columns = columnDao.getByIndDescriptionAndIndColumnCheckAndIndForeignKey(database.getId(), false, false, false);  
 
 		if (columns == null || columns.size() == 0) {
 			return;
@@ -1010,13 +1020,22 @@ public class RdbToOntoBO {
 			// Inserir na T022.
 			ObjectPropertyDomainRange objectPropertyDomainRange = new ObjectPropertyDomainRange();
 			
-			//TODO
-			//objectPropertyDomainRange.setClassDomain(classDao.getByTable(column.getTable()));
+			br.ufpr.bean.Class classDomain = classDao.getByTable(column.getTable());
+			objectPropertyDomainRange.setClassDomain(classDomain);
 			
-			objectPropertyDomainRange.setClassRange(classDao.getByTable(column.getFkTable()));
+			br.ufpr.bean.Class classRange = classDao.getByTable(column.getFkTable());
+			objectPropertyDomainRange.setClassRange(classRange);
+			
 			objectPropertyDomainRange.setObjectProperty(objectProperty);
 			
 			objectPropertyDomainRangeDao.saveOrUpdate(objectPropertyDomainRange); // PASSO 31
+			
+			// Inserir na T012.
+			Hierarchy hierarchy = new Hierarchy();
+			hierarchy.setSuperClass(classDomain);
+			hierarchy.setSubClass(classRange);
+
+			hierarchyDao.saveOrUpdate(hierarchy); // PASSO 32
 		}
 	}
 	
@@ -1040,26 +1059,12 @@ public class RdbToOntoBO {
 				Table table = tableDao.getByPhysicalName(database.getId(), fields[7]);
 				record.setTable(table);
 
-				// Cadastrando na T004.
+				// Inserir na T004.
 				recordDao.saveOrUpdate(record); // PASSO 33
 				
-				// PASSO 34
-				if ("C".equals(table.getDescription())) {
-					br.ufpr.bean.Class c = new br.ufpr.bean.Class();
-					String name = "h" + Util.functionForImportRecords(record.getColumnvalues()); // PASSO 35
-					c.setName(name);
-					c.setOntology(ontology);
-					c.setRecord(record);
-					classDao.saveOrUpdate(c); // PASSO 35
-					
-					Hierarchy hierarchy = new Hierarchy();
-					hierarchy.setSuperClass(classDao.getByTable(table));
-					hierarchy.setSubClass(c);
-
-					hierarchyDao.saveOrUpdate(hierarchy); // PASSO 35 
-				}
 				// PASSO 37
-				else {
+				if (!"C".equals(table.getDescription())) {
+					// Inserir na T015.
 					Instance newIntance = new Instance();
 					String description = "i" + Util.functionForImportRecords(record.getColumnvalues()); // PASSO 37
 					newIntance.setDescription(description);
@@ -1071,5 +1076,87 @@ public class RdbToOntoBO {
 		}
 
 		scanner.close();
+	}
+	
+	public void importRecordsToClasses(RdbToOntoForm form, Database database, Ontology ontology) throws FileNotFoundException, IOException {
+		// PASSO 34
+		// Verificar quais registros da T004 são relacionados a tabelas que possuem alguma coluna com C003_PRIMARY_KEY = 1 AND C003_FOREIGN_KEY = 1.
+		
+		@SuppressWarnings("unchecked")
+		List<Record> records = (ArrayList<Record>) recordDao.findAll(Record.class);
+		
+		Table table;
+		Column column;
+		
+		for (Record record : records) {
+			table = null;
+			column = null;
+			
+			table = record.getTable();
+			
+			if ("C".equals(table.getDescription())) {
+				// Verificar se a tabela possui alguma coluna C003_PRIMARY_KEY = 1 AND C003_FOREIGN_KEY = 1.
+				
+				column = columnDao.getByTableAndPrimaryKeyAndForeignKey(table.getId(), true, true);
+				
+				// Se for null, significa que a tabela não possui nenhuma coluna com C003_PRIMARY_KEY = 1 AND C003_FOREIGN_KEY = 1.
+				// Portanto, deve ser importada no PASSO 35.
+				if (column == null) {
+					// Inserir na T011.
+					br.ufpr.bean.Class c = new br.ufpr.bean.Class();
+					String name = "h" + Util.functionForImportRecords(record.getColumnvalues()); // PASSO 35
+					c.setName(name);
+					c.setOntology(ontology);
+					c.setRecord(record);
+					classDao.saveOrUpdate(c); // PASSO 35
+					
+					// Inserir na T012.
+					Hierarchy hierarchy = new Hierarchy();
+					hierarchy.setSuperClass(classDao.getByTable(table));
+					hierarchy.setSubClass(c);
+
+					hierarchyDao.saveOrUpdate(hierarchy); // PASSO 35 
+				}
+			}
+		}
+		
+		for (Record record : records) {
+			table = null;
+			column = null;
+			
+			table = record.getTable();
+			
+			if ("C".equals(table.getDescription())) {
+				// Verificar se a tabela possui alguma coluna C003_PRIMARY_KEY = 1 AND C003_FOREIGN_KEY = 1.
+				
+				column = columnDao.getByTableAndPrimaryKeyAndForeignKey(table.getId(), true, true);
+				
+				// Se for diferente de null, significa que a tabela não possui nenhuma coluna com C003_PRIMARY_KEY = 1 AND C003_FOREIGN_KEY = 1.
+				// Portanto, deve ser importada no PASSO 36.
+				if (column != null) {
+					// Inserir na T011.
+					br.ufpr.bean.Class c = new br.ufpr.bean.Class();
+					String name = "h" + Util.functionForImportRecords(record.getColumnvalues()); // PASSO 36
+					c.setName(name);
+					c.setOntology(ontology);
+					c.setRecord(record);
+					classDao.saveOrUpdate(c); // PASSO 36
+					
+					// Inserir na T012.
+					Hierarchy hierarchy = new Hierarchy();
+					hierarchy.setSuperClass(classDao.getByTable(table));
+					hierarchy.setSubClass(c);
+
+					hierarchyDao.saveOrUpdate(hierarchy); // PASSO 36
+					
+					// Inserir na T012.
+					Hierarchy hierarchy2 = new Hierarchy();
+					hierarchy2.setSuperClass(classDao.getByTable(column.getFkTable()));
+					hierarchy2.setSubClass(c);
+
+					hierarchyDao.saveOrUpdate(hierarchy2); // PASSO 36
+				}
+			}
+		}
 	}
 }

@@ -87,7 +87,7 @@ public class ColumnDao extends GenericDao {
 		return retorno;
 	}
 	
-	public List<Column> getByIndDescriptionAndIndColumnCheck(Long databaseId, boolean indDescription, boolean indColumnCheck) {
+	public List<Column> getByIndDescriptionAndIndColumnCheckAndIndForeignKey(Long databaseId, boolean indDescription, boolean indColumnCheck, boolean indForeignKey) {
 		Session session = getSession();
 		Transaction tx = null;
 		List<Column> retorno = null;
@@ -97,6 +97,7 @@ public class ColumnDao extends GenericDao {
 			Criteria criteria = session.createCriteria(Column.class);
 			criteria.add(Restrictions.eq("indDescription", indDescription));
 			criteria.add(Restrictions.eq("indColumnCheck", indColumnCheck));
+			criteria.add(Restrictions.eq("foreignKey", indForeignKey));
 			
 			@SuppressWarnings("unchecked")
 			List<Column> columns = criteria.list();
@@ -217,6 +218,40 @@ public class ColumnDao extends GenericDao {
 			criteria.add(Restrictions.eq("primaryKey", column.isPrimaryKey()));
 			criteria.add(Restrictions.eq("table.id", column.getTable().getId()));
 			criteria.add(Restrictions.ne("id", column.getId()));
+			
+			try {
+				retorno = (Column) criteria.list().get(0);
+			}
+			catch(Exception e) {
+				retorno = null;
+			}
+			
+			tx.commit();
+		}
+		catch (HibernateException e) {
+			if (tx != null) {
+				tx.rollback();
+			}
+			e.printStackTrace(); 
+		}
+		finally {
+			session.close(); 
+		}
+
+		return retorno;
+	}
+	
+	public Column getByTableAndPrimaryKeyAndForeignKey(long tableId, boolean primaryKey, boolean foreignKey) {
+		Session session = getSession();
+		Transaction tx = null;
+		Column retorno = null;
+
+		try {
+			tx = session.beginTransaction();
+			Criteria criteria = session.createCriteria(Column.class);
+			criteria.add(Restrictions.eq("primaryKey", primaryKey));
+			criteria.add(Restrictions.eq("foreignKey", foreignKey));
+			criteria.add(Restrictions.eq("table.id", tableId));
 			
 			try {
 				retorno = (Column) criteria.list().get(0);
