@@ -2,6 +2,7 @@ package br.ufpr.bo;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -26,6 +27,7 @@ import br.ufpr.bean.Ontology;
 import br.ufpr.bean.Record;
 import br.ufpr.bean.Table;
 import br.ufpr.bean.TableDatabaseDomain;
+import br.ufpr.bean.Type;
 import br.ufpr.dao.CheckSubjectDao;
 import br.ufpr.dao.CheckValueDao;
 import br.ufpr.dao.ClassDao;
@@ -47,6 +49,7 @@ import br.ufpr.dao.OntologyDao;
 import br.ufpr.dao.RecordDao;
 import br.ufpr.dao.TableDao;
 import br.ufpr.dao.TableDatabaseDomainDao;
+import br.ufpr.dao.TypeDao;
 import br.ufpr.form.RdbToOntoForm;
 import br.ufpr.util.Util;
 
@@ -73,17 +76,16 @@ public class RdbToOntoBO {
 	ObjectPropertyDomainRangeDao objectPropertyDomainRangeDao = new ObjectPropertyDomainRangeDao();
 	DatatypePropertyDomainDao datatypePropertyDomainDao = new DatatypePropertyDomainDao();
 	RecordDao recordDao = new RecordDao();
+	TypeDao typeDao = new TypeDao();
 
-	/**
-	 * 
-	 * @param form
-	 * @return
-	 */
 	public Database importFile(RdbToOntoForm form) {
 
 		Database database = new Database();
 		Ontology ontology = null;
 
+		// PASSO 40
+		initializeTbType();
+		
 		database.setName(form.getDatabaseName().toLowerCase());
 
 		// Salvando o nome do banco de dados na T001.
@@ -164,6 +166,15 @@ public class RdbToOntoBO {
 		try {
 			// Os registros inseridos na T004 em que o T004.c002_table_id é T002.c002_table_type = C serão transformados em classes na T011.
 			importRecordsToClasses(form, database, ontology); // PASSO 34
+		}
+		catch (Exception e1) {
+			e1.printStackTrace();
+			return null;
+		}
+		
+		try {
+			// PASSO 40
+			convertTbType(database);
 		}
 		catch (Exception e1) {
 			e1.printStackTrace();
@@ -1157,6 +1168,60 @@ public class RdbToOntoBO {
 					hierarchyDao.saveOrUpdate(hierarchy2); // PASSO 36
 				}
 			}
+		}
+	}
+	
+	/**
+	 * Método utilizado para popular a tabela tb_type.
+	 */
+	public void initializeTbType() {
+		// Verificando se a tabela tb_type já possui os valores.
+		
+		int qtd = 0;
+		
+		try {
+			qtd = typeDao.getQtd();
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		// Se já possui os valores na tabela, nem tenta inserir novamente.
+		if (qtd > 0) {
+			return;
+		}
+		
+		// Insere os registros na tb_type.
+		try {
+			typeDao.insertTypes();
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * 
+	 * @param database
+	 */
+	public void convertTbType(Database database) {
+		@SuppressWarnings("unchecked")
+		List<DatatypeOnto> datatypeOntos = datatypeOntoDao.findAll(DatatypeOnto.class);
+		String description = "";
+		Type type = null;
+		
+		for (DatatypeOnto datatypeOnto : datatypeOntos) {
+			description = Util.cleanDataType(datatypeOnto.getDescription());
+			type = typeDao.getByNameDatabase(description);
+			
+			if (type == null) {
+				datatypeOnto.setDescription("string");
+			}
+			else {
+				datatypeOnto.setDescription(type.getNameXml());
+			}
+			
+			datatypeOntoDao.saveOrUpdate(datatypeOnto);
 		}
 	}
 }

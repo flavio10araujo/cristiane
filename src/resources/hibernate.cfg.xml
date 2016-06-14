@@ -6,9 +6,22 @@
 	<session-factory>
 		<property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
 		<property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
+		
 		<property name="hibernate.connection.url">jdbc:mysql://localhost/rdbtoonto</property>
 		<property name="hibernate.connection.username">root</property>
 		<property name="hibernate.connection.password">12345</property>
+		
+		<!--
+		<property name="hibernate.connection.url">jdbc:mysql://rdbtoonto.mysql.uhserver.com/rdbtoonto</property>
+		<property name="hibernate.connection.username">rdbtoonto</property>
+		<property name="hibernate.connection.password">rd@B2ONTO</property>
+		-->
+		<!--
+		<property name="hibernate.connection.url">jdbc:mysql://184.107.24.224/polifono_rdbtoonto</property>
+		<property name="hibernate.connection.username">polifono_poli</property>
+		<property name="hibernate.connection.password">pW$#1998tT</property>
+		-->
+		
 		<property name="hibernate.hbm2ddl.auto">update</property>
 		<property name="show_sql">true</property>
 		<property name="hibernate.current_session_context_class">thread</property>
@@ -36,6 +49,7 @@
 		<mapping class="br.ufpr.bean.ObjectPropertyDomainRange" />
 		<mapping class="br.ufpr.bean.DatatypePropertyDomain" />
 		<mapping class="br.ufpr.bean.Record" />
+		<mapping class="br.ufpr.bean.Type" />
 		<!-- Mapping -->
 	</session-factory>
 </hibernate-configuration>
