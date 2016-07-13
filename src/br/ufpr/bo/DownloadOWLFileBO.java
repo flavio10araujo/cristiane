@@ -209,10 +209,10 @@ public class DownloadOWLFileBO {
 		List<DatatypeProperty> datatypePropertyList = datatypePropertyDao.getByIndDescription(true);
 		
 		for (DatatypeProperty datatypeProperty : datatypePropertyList) {
-    		file.append("<DataPropertyDomain>");
+    		/*file.append("<DataPropertyDomain>");
     		file.append("<DataProperty IRI=\"#");file.append(datatypeProperty.getDescription());file.append("\" />");
     		file.append("<Class IRI=\"#Thing\" />");
-    		file.append("</DataPropertyDomain>");
+    		file.append("</DataPropertyDomain>");*/
     		
     		//file.append("<Declaration><DataProperty IRI=\"#descricao\" /></Declaration>");
     		file.append("<Declaration><DataProperty IRI=\"#");file.append(datatypeProperty.getDescription());file.append("\" /></Declaration>");

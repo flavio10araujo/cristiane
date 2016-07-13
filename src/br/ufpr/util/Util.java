@@ -5,18 +5,24 @@ import java.text.Normalizer;
 public class Util {
 
 	public static void main(String[] Args) {
-		//System.out.println(funcaoMaiuscula("01_Cadastros básicos do sistema"));
-		//System.out.println(funcaoMinuscula("01_Cadastros básicos do sistema"));
+		System.out.println(funcaoMaiuscula("01_Cadastros básicos do sistema"));
+		System.out.println(funcaoMinuscula("01_Cadastros básicos do sistema"));
+		System.out.println(funcaoMaiuscula("R"));
+		System.out.println(funcaoMaiuscula("nm_usuario"));
+		System.out.println(funcaoMaiuscula("dt_alteração"));
+				
 		/*System.out.println(functionForImportRecords("[1, Procedimentos Cirurgicos]"));
 		System.out.println(functionForImportRecords("[1,  Procedimentos Cirurgicos]"));
 		System.out.println(functionForImportRecords("[1,Procedimentos Cirurgicos]"));
 		System.out.println(functionForImportRecords("[2, Procedimentos de urgencia]"));*/
+
 		//System.out.println(functionForInverseObjectProperties("temRestricaoSexo"));
-		System.out.println(cleanDataType("number"));
+
+		/*System.out.println(cleanDataType("number"));
 		System.out.println(cleanDataType("varchar2"));
 		System.out.println(cleanDataType("number(15,2)"));
 		System.out.println(cleanDataType("varchar2 (100)"));
-		System.out.println(cleanDataType("CHAR"));
+		System.out.println(cleanDataType("CHAR"));*/
 	}
 
 	/**
@@ -31,6 +37,10 @@ public class Util {
 	public static String funcaoMaiuscula(String str) {
 		if (str == null || "".equals(str)) {
 			return "";
+		}
+		
+		if (str.length() <= 2) {
+			return funcaoMaiusculaSizeLE2(str);
 		}
 
 		str = removeNumbersAndOthers(str);
@@ -47,6 +57,12 @@ public class Util {
 		}
 
 		return retorno.toString();
+	}
+	
+	
+	public static String funcaoMaiusculaSizeLE2(String str) {
+		str = toCamelCase(removeAccents(removeNumbersAndOthers(str)));
+		return str;
 	}
 
 	/**
@@ -114,7 +130,7 @@ public class Util {
 		//str.replaceAll("[^A-Za-z]", ""); // Only letters.
 
 		str = str.replaceAll("[0-9]", ""); // Remove all the numbers.
-		str = str.replaceAll("_", "");
+		str = str.replaceAll("_", " ");
 		return str;
 	}
 

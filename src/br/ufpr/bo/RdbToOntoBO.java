@@ -685,6 +685,9 @@ public class RdbToOntoBO {
 					// Inserir na T013.
 					datatypePropertyDao.saveOrUpdate(datatypeProperty); // PASSO 19
 				}
+				else {
+					datatypeProperty = datatypePropertyExistente;
+				}
 
 				// Inserir na T020.
 				ColumnToDatatypeProperty columnToDatatypeProperty = new ColumnToDatatypeProperty();
@@ -747,6 +750,9 @@ public class RdbToOntoBO {
 				if (datatypePropertyExistente == null) {
 					// Inserir na T013.
 					datatypePropertyDao.saveOrUpdate(datatypeProperty);
+				}
+				else {
+					datatypeProperty = datatypePropertyExistente;
 				}
 
 				// Inserir na T020.
@@ -1074,7 +1080,7 @@ public class RdbToOntoBO {
 				recordDao.saveOrUpdate(record); // PASSO 33
 				
 				// PASSO 37
-				if (!"C".equals(table.getDescription())) {
+				if ("D".equals(table.getDescription())) {
 					// Inserir na T015.
 					Instance newIntance = new Instance();
 					String description = "i" + Util.functionForImportRecords(record.getColumnvalues()); // PASSO 37
