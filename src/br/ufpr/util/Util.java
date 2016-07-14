@@ -131,6 +131,9 @@ public class Util {
 
 		str = str.replaceAll("[0-9]", ""); // Remove all the numbers.
 		str = str.replaceAll("_", " ");
+		
+		str = str.replaceAll("[(*¨%&!?´`#$%¨*&@]", "")//Remove all special Characters
+			       .replaceAll("[()={}\\[\\]~^|<>]", "").replaceAll("[-_+'ªº/¬]", "");
 		return str;
 	}
 
@@ -238,4 +241,5 @@ public class Util {
 		
 		return str;
 	}
+		
 }
