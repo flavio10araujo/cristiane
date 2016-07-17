@@ -19,6 +19,7 @@ public class DatatypePropertyDomain implements Serializable {
 	@JoinColumn(name = "c013_datatype_property_id")
 	private DatatypeProperty datatypeProperty;
 	
+	@Id
 	@ManyToOne
 	@JoinColumn(name = "c011_class_id_domain")
 	private br.ufpr.bean.Class classDomain;
