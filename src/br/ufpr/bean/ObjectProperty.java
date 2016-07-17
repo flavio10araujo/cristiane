@@ -29,10 +29,10 @@ public class ObjectProperty implements Serializable {
 	private Ontology ontology;
 	
 	@Column(name = "c019_ind_inverse_functional")
-	private Boolean indInverseFunctional;
+	private boolean indInverseFunctional;
 	
 	@Column(name = "c019_min_cardinality")
-	private Boolean minCardinality;
+	private boolean minCardinality;
 	
 	public Long getId() {
 		return id;
@@ -58,19 +58,19 @@ public class ObjectProperty implements Serializable {
 		this.ontology = ontology;
 	}
 
-	public Boolean getIndInverseFunctional() {
+	public boolean getIndInverseFunctional() {
 		return indInverseFunctional;
 	}
 
-	public void setIndInverseFunctional(Boolean indInverseFunctional) {
+	public void setIndInverseFunctional(boolean indInverseFunctional) {
 		this.indInverseFunctional = indInverseFunctional;
 	}
 
-	public Boolean getMinCardinality() {
+	public boolean getMinCardinality() {
 		return minCardinality;
 	}
 
-	public void setMinCardinality(Boolean minCardinality) {
+	public void setMinCardinality(boolean minCardinality) {
 		this.minCardinality = minCardinality;
 	}
 }
