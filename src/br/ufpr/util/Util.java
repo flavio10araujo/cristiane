@@ -5,16 +5,17 @@ import java.text.Normalizer;
 public class Util {
 
 	public static void main(String[] Args) {
-		System.out.println(funcaoMaiuscula("01_Cadastros básicos do sistema"));
+		/*System.out.println(funcaoMaiuscula("01_Cadastros básicos do sistema"));
 		System.out.println(funcaoMinuscula("01_Cadastros básicos do sistema"));
 		System.out.println(funcaoMaiuscula("R"));
 		System.out.println(funcaoMaiuscula("nm_usuario"));
-		System.out.println(funcaoMaiuscula("dt_alteração"));
+		System.out.println(funcaoMaiuscula("dt_alteração"));*/
 				
-		/*System.out.println(functionForImportRecords("[1, Procedimentos Cirurgicos]"));
+		System.out.println(functionForImportRecords("[1, Procedimentos Cirurgicos]"));
 		System.out.println(functionForImportRecords("[1,  Procedimentos Cirurgicos]"));
 		System.out.println(functionForImportRecords("[1,Procedimentos Cirurgicos]"));
-		System.out.println(functionForImportRecords("[2, Procedimentos de urgencia]"));*/
+		System.out.println(functionForImportRecords("[2, Procedimentos de urgencia]"));
+		System.out.println(functionForImportRecords("[331,345,DOCUMENTACAO ORTODONTICA \"A\"]"));
 
 		//System.out.println(functionForInverseObjectProperties("temRestricaoSexo"));
 
@@ -151,7 +152,7 @@ public class Util {
 			return "";
 		}
 
-		str = str.replaceAll("\\[", "").replaceAll("\\]","").replaceAll(",", " ");
+		str = str.replaceAll("\\[", "").replaceAll("\\]","").replaceAll(",", " ").replaceAll("\"", "");
 
 		String[] strArr = str.split(" ");
 		str = "";
