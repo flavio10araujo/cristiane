@@ -193,7 +193,12 @@ public class Util {
 			return "";
 		}
 
-		str = "e" + str.substring(3) + "De";
+		if ("Tem".equals(str.substring(3))) {
+			str = "e" + str.substring(3) + "De";
+		} else {
+			str = "e" + str.substring(2) + "De";
+		}
+		
 
 		return str;
 	}

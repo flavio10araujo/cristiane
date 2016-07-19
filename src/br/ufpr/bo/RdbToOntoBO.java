@@ -671,6 +671,7 @@ public class RdbToOntoBO {
 			datatypeProperty.setDescription(description);
 			datatypeProperty.setOntology(ontology);
 			datatypeProperty.setIndDescription(true); // PASSO 19.1
+			datatypeProperty.setIndCommonConcept(true); // PASSO 20.1
 
 			DatatypeOnto datatypeOnto = datatypeOntoDao.getByDatatypeDb(column.getDatatypeDb());
 
@@ -736,7 +737,6 @@ public class RdbToOntoBO {
 			description = "a" + Util.funcaoMaiuscula(column.getLogicalName());
 			datatypeProperty.setDescription(description);
 			datatypeProperty.setOntology(ontology);
-			datatypeProperty.setIndCommonConcept(true); // PASSO 20.1
 
 			DatatypeOnto datatypeOnto = datatypeOntoDao.getByDatatypeDb(column.getDatatypeDb());
 
@@ -772,19 +772,19 @@ public class RdbToOntoBO {
 	}
 	
 	public void importObjectProperty(Database database, Ontology ontology) {
-		
+		//UK
 		// Colunas com C003_IND_COLUMN_CHECK = 0 AND C003_IND_PRIMARY_KEY = 0 AND C003_IND_FOREIGN_KEY = 0 AND C003_IND_UNIQUE_KEY = 1
 		importObjectProperty01(database, ontology); // PASSO 18.1
-
+		//PK
 		// Colunas com C003_IND_COLUMN_CHECK = 0 AND C003_IND_PRIMARY_KEY = 1 AND C003_IND_FOREIGN_KEY = 0 AND C003_IND_UNIQUE_KEY = 0
 		importObjectProperty02(database, ontology); // PASSO 18.2
-		
+		//COLUMN_CHECK
 		// Colunas com C003_IND_COLUMN_CHECK = 1 AND C003_IND_PRIMARY_KEY = 0 AND C003_IND_FOREIGN_KEY = 0 AND C003_IND_UNIQUE_KEY = 0.
 		importObjectProperty03(database, ontology); // PASSO 22
 		
 		// Colunas com C003_IND_PRIMARY_KEY = 1 de tabelas associativas.
 		importObjectProperty04(database, ontology); // PASSO 27
-		
+		//FK
 		// Colunas com C003_IND_FOREIGN_KEY = 1.
 		importObjectProperty05(database, ontology); // PASSO 30
 	}
@@ -812,7 +812,7 @@ public class RdbToOntoBO {
 			}
 			
 			// PASSO 26
-			if (column.isPrimaryKey() || column.isForeignKey() || column.isUniqueKey()) {
+			if (column.isPrimaryKey() || column.isForeignKey()) {
 				continue;
 			}
 			
@@ -835,9 +835,7 @@ public class RdbToOntoBO {
 			// Inserir na T022.
 			ObjectPropertyDomainRange objectPropertyDomainRange = new ObjectPropertyDomainRange();
 			objectPropertyDomainRange.setClassRange(classDao.getByTable(column.getTable())); // objectPropertyDomainRange.setClassDomain(classDao.getByTable(column.getTable()));
-			
 			objectPropertyDomainRange.setObjectProperty(objectProperty);
-			
 			objectPropertyDomainRangeDao.saveOrUpdate(objectPropertyDomainRange);
 		}
 	}
@@ -849,7 +847,7 @@ public class RdbToOntoBO {
 	 */
 	public void importObjectProperty02(Database database, Ontology ontology) {
 		// Colunas com C003_IND_COLUMN_CHECK = 0 AND C003_IND_PRIMARY_KEY = 1 AND C003_IND_FOREIGN_KEY = 0 AND C003_IND_UNIQUE_KEY = 0
-		List<Column> columns = columnDao.getByIndsColumncheckPrimarykeyForeignkeyUniquekey(database.getId(), false, false, false, true);
+		List<Column> columns = columnDao.getByIndsColumncheckPrimarykeyForeignkeyUniquekey(database.getId(), false, true, false, false);
 		
 		if (columns == null || columns.size() == 0) {
 			return;
@@ -865,7 +863,7 @@ public class RdbToOntoBO {
 			}
 			
 			// PASSO 26
-			if (column.isPrimaryKey() || column.isForeignKey() || column.isUniqueKey()) {
+			if (column.isForeignKey() || column.isUniqueKey()) {
 				continue;
 			}
 			
@@ -888,9 +886,7 @@ public class RdbToOntoBO {
 			// Inserir na T022.
 			ObjectPropertyDomainRange objectPropertyDomainRange = new ObjectPropertyDomainRange();
 			objectPropertyDomainRange.setClassRange(classDao.getByTable(column.getTable())); // objectPropertyDomainRange.setClassDomain(classDao.getByTable(column.getTable()));
-			
 			objectPropertyDomainRange.setObjectProperty(objectProperty);
-			
 			objectPropertyDomainRangeDao.saveOrUpdate(objectPropertyDomainRange);
 		}
 	}
@@ -939,12 +935,9 @@ public class RdbToOntoBO {
 			// Inserir na T022.
 			ObjectPropertyDomainRange objectPropertyDomainRange = new ObjectPropertyDomainRange();
 			objectPropertyDomainRange.setClassDomain(classDao.getByTable(column.getTable()));
-			
 			ColumnCheckValue columnCheckValue = columnCheckValueDao.getByColumn(column);
 			objectPropertyDomainRange.setClassRange(classDao.getByCheckSubject(columnCheckValue.getCheckValue().getCheckSubject()));
-			
 			objectPropertyDomainRange.setObjectProperty(objectProperty);
-			
 			objectPropertyDomainRangeDao.saveOrUpdate(objectPropertyDomainRange); // PASSO 22
 		}
 	}
@@ -994,7 +987,6 @@ public class RdbToOntoBO {
 			// PASSO 28
 			Column columnAux = columnDao.getByIndPrimaryKeyTableAndId(column);
 			objectPropertyDomainRange.setClassDomain(classDao.getByTable(columnAux.getFkTable()));
-			
 			objectPropertyDomainRangeDao.saveOrUpdate(objectPropertyDomainRange);
 		}
 	}
@@ -1036,15 +1028,11 @@ public class RdbToOntoBO {
 			
 			// Inserir na T022.
 			ObjectPropertyDomainRange objectPropertyDomainRange = new ObjectPropertyDomainRange();
-			
 			br.ufpr.bean.Class classDomain = classDao.getByTable(column.getTable());
 			objectPropertyDomainRange.setClassDomain(classDomain);
-			
 			br.ufpr.bean.Class classRange = classDao.getByTable(column.getFkTable());
 			objectPropertyDomainRange.setClassRange(classRange);
-			
 			objectPropertyDomainRange.setObjectProperty(objectProperty);
-			
 			objectPropertyDomainRangeDao.saveOrUpdate(objectPropertyDomainRange); // PASSO 31
 			
 			// Inserir na T012.

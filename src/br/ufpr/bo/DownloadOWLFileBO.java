@@ -281,6 +281,62 @@ public class DownloadOWLFileBO {
 			file.append(objectProperty.getDescription());
 			file.append("\"/></Declaration>");
 			
+						
+			objectPropertyDomainRange = objectPropertyDomainRangeDao.findByObjectProperty(objectProperty);
+			
+			//TODO - retirar esse IF depois de terminar o passo 31
+			if (objectPropertyDomainRange.getClassDomain() != null) {
+				file.append("<ObjectPropertyDomain><ObjectProperty IRI=\"#");
+				file.append(objectProperty.getDescription());
+				file.append("\" /><Class IRI=\"#");
+				file.append(objectPropertyDomainRange.getClassDomain().getName());
+				file.append("\" /></ObjectPropertyDomain>");
+			}
+			
+			if (objectPropertyDomainRange.getClassRange() != null) {
+				
+				// Se C019_MIN_CARDINALITY = 0
+				if (!objectProperty.getMinCardinality()) {
+					file.append("<ObjectPropertyRange><ObjectProperty IRI=\"#");
+					file.append(objectProperty.getDescription());
+					file.append("\" /><Class IRI=\"#");
+					file.append(objectPropertyDomainRange.getClassRange().getName());
+					file.append("\" /></ObjectPropertyRange>");
+					
+				}
+				// Se C019_MIN_CARDINALITY = 1
+				else {
+					//file.append("<ObjectPropertyRange><ObjectProperty IRI=\"#temCodigodoProcedimento\" /><ObjectMinCardinality cardinality=\"1\"><ObjectProperty IRI=\"#temCodigodoProcedimento\" /><Class IRI=\"#eProcedimento\" /></ObjectMinCardinality></ObjectPropertyRange>");
+					file.append("<ObjectPropertyRange><ObjectProperty IRI=\"#");
+					file.append(objectProperty.getDescription());
+					file.append("\" /><ObjectMinCardinality cardinality=\"1\"><ObjectProperty IRI=\"#");
+					file.append(objectProperty.getDescription());
+					file.append("\" /><Class IRI=\"#");
+					file.append(objectPropertyDomainRange.getClassRange().getName());
+					file.append("\" /></ObjectMinCardinality></ObjectPropertyRange>");
+					
+				}
+			}
+		}
+		
+		return file;
+	}
+	
+	public StringBuffer setObjectProperty02() {
+		StringBuffer file = new StringBuffer();
+		
+		// C019_IND_INVERSE_FUNCTIONAL = 1
+		
+		List<ObjectProperty> objectPropertyList = objectPropertyDao.getByIndInverseFunctional(true);
+		ObjectPropertyDomainRange objectPropertyDomainRange = null;
+		
+		for (ObjectProperty objectProperty : objectPropertyList) {
+		
+			//file.append("<Declaration><ObjectProperty IRI=\"#PKCodigodoProcedimento\" /></Declaration>");
+			file.append("<Declaration><ObjectProperty IRI=\"#");
+			file.append(objectProperty.getDescription());
+			file.append("\"/></Declaration>");
+	
 			//file.append("<InverseObjectProperties><ObjectProperty IRI=\"#temRestricaoSexo\" /><ObjectProperty IRI=\"#eRestricaoSexoDe\" /></InverseObjectProperties>");
 			file.append("<InverseObjectProperties><ObjectProperty IRI=\"#");
 			file.append(objectProperty.getDescription());
@@ -293,23 +349,7 @@ public class DownloadOWLFileBO {
 			file.append(Util.functionForInverseObjectProperties(objectProperty.getDescription()));
 			file.append("\" /></Declaration>");
 			
-			objectPropertyDomainRange = objectPropertyDomainRangeDao.findByObjectProperty(objectProperty);
-			
-			//TODO - retirar esse IF depois de terminar o passo 31
-			if (objectPropertyDomainRange.getClassDomain() != null) {
-			file.append("<ObjectPropertyDomain><ObjectProperty IRI=\"#");
-			file.append(objectProperty.getDescription());
-			file.append("\" /><Class IRI=\"#");
-			file.append(objectPropertyDomainRange.getClassDomain().getName());
-			file.append("\" /></ObjectPropertyDomain>");
-			
-			//file.append("<ObjectPropertyDomain><ObjectProperty IRI=\"#eRestricaoSexoDe\" /><Class IRI=\"#Sexo\" /></ObjectPropertyDomain>");
-			file.append("<ObjectPropertyDomain><ObjectProperty IRI=\"#");
-			file.append(Util.functionForInverseObjectProperties(objectProperty.getDescription()));
-			file.append("\" /><Class IRI=\"#");
-			file.append(objectPropertyDomainRange.getClassRange().getName());
-			file.append("\" /></ObjectPropertyDomain>");
-			}
+			objectPropertyDomainRange = objectPropertyDomainRangeDao.findByObjectProperty(objectProperty);		
 			
 			if (objectPropertyDomainRange.getClassRange() != null) {
 				
@@ -347,43 +387,6 @@ public class DownloadOWLFileBO {
 					file.append(objectPropertyDomainRange.getClassRange().getName());
 					file.append("\" /></ObjectMinCardinality></ObjectPropertyRange>");
 				}
-			}
-		}
-		
-		return file;
-	}
-	
-	public StringBuffer setObjectProperty02() {
-		StringBuffer file = new StringBuffer();
-		
-		// C019_IND_INVERSE_FUNCTIONAL = 1
-		
-		List<ObjectProperty> objectPropertyList = objectPropertyDao.getByIndInverseFunctional(true);
-		ObjectPropertyDomainRange objectPropertyDomainRange = null;
-		
-		for (ObjectProperty objectProperty : objectPropertyList) {
-		
-			//file.append("<Declaration><ObjectProperty IRI=\"#PKCodigodoProcedimento\" /></Declaration>");
-			file.append("<Declaration><ObjectProperty IRI=\"#");
-			file.append(objectProperty.getDescription());
-			file.append("\"/></Declaration>");
-	
-			//file.append("<InverseFunctionalObjectProperty><ObjectProperty IRI=\"#PKCodigodoProcedimento\" /></InverseFunctionalObjectProperty>");
-			file.append("<InverseFunctionalObjectProperty><ObjectProperty IRI=\"#");
-			file.append(objectProperty.getDescription());
-			file.append("\"/></InverseFunctionalObjectProperty>");
-	
-			objectPropertyDomainRange = objectPropertyDomainRangeDao.findByObjectProperty(objectProperty);		
-			
-			if (objectPropertyDomainRange.getClassRange() != null) {
-				//file.append("<ObjectPropertyRange><ObjectProperty IRI=\"#PKCodigodoProcedimento\" /><ObjectMinCardinality cardinality=\"1\"><ObjectProperty IRI=\"#PKCodigodoProcedimento\" /><Class IRI=\"#eProcedimento\" /></ObjectMinCardinality></ObjectPropertyRange>");
-				file.append("<ObjectPropertyRange><ObjectProperty IRI=\"#");
-				file.append(objectProperty.getDescription());
-				file.append("\" /><ObjectMinCardinality cardinality=\"1\"><ObjectProperty IRI=\"#");
-				file.append(objectProperty.getDescription());
-				file.append("\" /><Class IRI=\"#");
-				file.append(objectPropertyDomainRange.getClassRange().getName());
-				file.append("\" /></ObjectMinCardinality></ObjectPropertyRange>");
 			}
 		}
 		
