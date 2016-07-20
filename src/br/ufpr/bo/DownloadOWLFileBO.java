@@ -163,7 +163,7 @@ public class DownloadOWLFileBO {
 		return file;
 	}
 	
-	public StringBuffer setDataPropertyDomain02() {
+	public StringBuffer setDataPropertyDomain02_old() {
 		StringBuffer file = new StringBuffer();
 		StringBuffer file02 = new StringBuffer();
 		
@@ -198,6 +198,41 @@ public class DownloadOWLFileBO {
 
 		file.append(file02);
 		
+		return file;
+	}
+	
+	public StringBuffer setDataPropertyDomain02() {
+		StringBuffer file = new StringBuffer();
+		
+		// Para os registros da T013, em que (C013_IND_COMMON_CONCEPT = 1), o resultado da pesquisa na T014 retorne mais que 1 resultado.
+		//file.append("<DataPropertyDomain><DataProperty IRI=\"#primeiro_nome\" /><ObjectUnionOf><Class IRI=\"#Pessoa\" /><Class IRI=\"#Portugues\" /></ObjectUnionOf></DataPropertyDomain>");
+		List<DatatypeProperty> datatypePropertyList = datatypePropertyDao.getByIndCommonConcept(true);
+		List<DatatypePropertyDomain> datatypePropertyDomainList = null; 
+		
+		for (DatatypeProperty datatypeProperty : datatypePropertyList) {
+			//file.append("<Declaration><DataProperty IRI=\"#primeiro_nome\" /></Declaration>");
+			file.append("<Declaration><DataProperty IRI=\"#");file.append(datatypeProperty.getDescription());file.append("\" /></Declaration>");
+			
+			file.append("<DataPropertyDomain>");
+    		file.append("<DataProperty IRI=\"#");file.append(datatypeProperty.getDescription());file.append("\" />");
+    		file.append("<ObjectUnionOf>");
+    		
+    		datatypePropertyDomainList = datatypePropertyDomainDao.getByDatatypePropertyID(datatypeProperty.getId());
+    		for (DatatypePropertyDomain datatypePropertyDomain : datatypePropertyDomainList) {
+    			file.append("<Class IRI=\"#");file.append(datatypePropertyDomain.getClassDomain().getName());file.append("\" />");
+    		}
+    		
+    		file.append("</ObjectUnionOf>");
+    		file.append("</DataPropertyDomain>");
+    		
+    		//file.append("<DataPropertyRange><DataProperty IRI=\"#primeiro_nome\" /><Datatype abbreviatedIRI=\"xsd:strinh\" /></DataPropertyRange>");
+    		file.append("<DataPropertyRange><DataProperty IRI=\"#");
+    		file.append(datatypeProperty.getDescription());
+    		file.append("\" /><Datatype abbreviatedIRI=\"xsd:");
+    		file.append(datatypeProperty.getDatatypeOnto().getDescription());
+    		file.append("\" /></DataPropertyRange>");
+    	}
+
 		return file;
 	}
 	

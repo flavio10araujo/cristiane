@@ -753,6 +753,8 @@ public class RdbToOntoBO {
 				}
 				else {
 					datatypeProperty = datatypePropertyExistente;
+					datatypeProperty.setIndCommonConcept(true);
+					datatypePropertyDao.saveOrUpdate(datatypeProperty);
 				}
 
 				// Inserir na T020.
