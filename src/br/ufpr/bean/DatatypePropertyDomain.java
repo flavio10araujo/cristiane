@@ -26,6 +26,32 @@ public class DatatypePropertyDomain implements Serializable {
 	
 	@Column(name = "c014_datatype_subproperty_of")
 	private boolean datatypeSubpropertyOf;
+	
+	public boolean equals(Object o) {
+		if (o == null) {
+			return false;
+		}
+		
+		if(!(o instanceof DatatypePropertyDomain)) {
+			return false;
+		}
+		
+		DatatypePropertyDomain other = (DatatypePropertyDomain) o;
+		
+	    if (this.datatypeProperty.getId() != other.datatypeProperty.getId()) {
+	    	return false;
+	    }
+	    
+	    if (this.classDomain.getId() != other.classDomain.getId()) {
+	    	return false;
+	    }
+
+	    return true;
+	}
+	
+	public int hashCode() {
+	    return (int) this.datatypeProperty.getId().hashCode() * this.classDomain.getId().hashCode();
+	}
 
 	public DatatypeProperty getDatatypeProperty() {
 		return datatypeProperty;

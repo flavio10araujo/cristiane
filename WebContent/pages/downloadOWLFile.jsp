@@ -3,9 +3,13 @@
 <%@ taglib uri="http://struts.apache.org/tags-logic" prefix="logic"%>
 
 <script type="text/javascript">
+	$(document).ready(function(){
+		$("#script-page").addClass("active");
+	});
+	
 	function submitForm(){
-		var form = document.forms[0];
-		form.action = "<html:rewrite page='/DownloadOWLFile.do' />";
+		var form=document.forms[0];
+		form.action="<html:rewrite page='/DownloadOWLFile.do' />";
 		form.submit();
 	}
 </script>

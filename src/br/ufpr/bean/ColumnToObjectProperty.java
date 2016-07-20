@@ -22,6 +22,32 @@ public class ColumnToObjectProperty implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "c019_object_property_id", nullable = false)
 	private ObjectProperty objectProperty;
+	
+	public boolean equals(Object o) {
+		if (o == null) {
+			return false;
+		}
+		
+		if(!(o instanceof ColumnToObjectProperty)) {
+			return false;
+		}
+		
+		ColumnToObjectProperty other = (ColumnToObjectProperty) o;
+		
+	    if (this.column.getId() != other.column.getId()) {
+	    	return false;
+	    }
+	    
+	    if (this.objectProperty.getId() != other.objectProperty.getId()) {
+	    	return false;
+	    }
+
+	    return true;
+	}
+	
+	public int hashCode() {
+	    return (int) this.column.getId().hashCode() * this.objectProperty.getId().hashCode();
+	}
 
 	public Column getColumn() {
 		return column;

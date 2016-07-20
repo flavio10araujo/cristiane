@@ -23,6 +23,32 @@ public class ColumnCheckValue implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "c006_check_value_id", nullable = false)
 	private CheckValue checkValue;
+	
+	public boolean equals(Object o) {
+		if (o == null) {
+			return false;
+		}
+		
+		if(!(o instanceof ColumnCheckValue)) {
+			return false;
+		}
+		
+		ColumnCheckValue other = (ColumnCheckValue) o;
+		
+	    if (this.column.getId() != other.column.getId()) {
+	    	return false;
+	    }
+	    
+	    if (this.checkValue.getId() != other.checkValue.getId()) {
+	    	return false;
+	    }
+
+	    return true;
+	}
+	
+	public int hashCode() {
+	    return (int) this.column.getId().hashCode() * this.checkValue.getId().hashCode();
+	}
 
 	public Column getColumn() {
 		return column;

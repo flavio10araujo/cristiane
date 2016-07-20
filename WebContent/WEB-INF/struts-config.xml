@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE struts-config PUBLIC 
-"-//Apache Software Foundation//DTD Struts Configuration 1.3//EN" 
-"http://jakarta.apache.org/struts/dtds/struts-config_1_3.dtd">
+<!DOCTYPE struts-config PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 1.3//EN" "http://jakarta.apache.org/struts/dtds/struts-config_1_3.dtd">
 
 <struts-config>
 	<form-beans>
@@ -26,7 +24,8 @@
 		</action>
 		
 		<action path="/CleanDataBase" type="br.ufpr.action.CleanDataBaseAction" name="rdbToOntoForm">
-			<forward name="success" path="tiles.cleanDataBase" />
+			<!--<forward name="success" path="tiles.cleanDataBase" />-->
+			<forward name="success" path="tiles.rdbToOnto" />
 		</action>
 		
 		<action path="/GoDownloadOWLFile" type="br.ufpr.action.GoRdbToOntoAction" name="rdbToOntoForm">
@@ -35,10 +34,14 @@
 		
 		<action path="/DownloadOWLFile" type="br.ufpr.action.DownloadOWLFileAction" name="rdbToOntoForm">
 			<forward name="success" path="tiles.downloadOWLFile" />
-		</action>			
+		</action>
+		
+		<action path="/ProjectDoc" type="br.ufpr.action.GoProjectDocAction" name="rdbToOntoForm">
+			<forward name="success" path="tiles.projectDoc" />
+		</action>
 	</action-mappings>
 	
-	<controller processorClass="org.apache.struts.tiles.TilesRequestProcessor"/>
+	<controller processorClass="org.apache.struts.tiles.TilesRequestProcessor" />
 	
 	<message-resources parameter="propertiesFiles.MessagesBundle" />
 	

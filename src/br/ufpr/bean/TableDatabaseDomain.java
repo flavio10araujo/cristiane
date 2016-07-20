@@ -17,11 +17,37 @@ public class TableDatabaseDomain implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "c008_database_domain_id", nullable = false)
 	private DatabaseDomain databaseDomain;
-	
+
 	@Id
 	@ManyToOne
 	@JoinColumn(name = "c002_table_id", nullable = false)
 	private Table table;
+
+	public boolean equals(Object o) {
+		if (o == null) {
+			return false;
+		}
+		
+		if(!(o instanceof TableDatabaseDomain)) {
+			return false;
+		}
+		
+		TableDatabaseDomain other = (TableDatabaseDomain) o;
+		
+	    if (this.databaseDomain.getId() != other.databaseDomain.getId()) {
+	    	return false;
+	    }
+	    
+	    if (this.table.getId() != other.table.getId()) {
+	    	return false;
+	    }
+
+	    return true;
+	}
+
+	public int hashCode() {
+	    return (int) this.databaseDomain.getId().hashCode() * this.table.getId().hashCode();
+	}
 
 	public DatabaseDomain getDatabaseDomain() {
 		return databaseDomain;

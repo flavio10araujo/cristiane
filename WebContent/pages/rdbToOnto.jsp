@@ -3,13 +3,44 @@
 <%@ taglib uri="http://struts.apache.org/tags-logic" prefix="logic"%>
 
 <script type="text/javascript">
+	$(document).ready(function(){
+		$("#rdbtoonto-page").addClass("active");
+	});
+	
+	$(document).ready(function(){
+		$("#btnRdbToOnto").click(function(){
+			$(this).button('loading');
+			if(!processRdbToOnto()){
+				$(this).button('reset');
+			}
+		});
+		
+		$("#btnCleanDatabase").click(function(){
+			$(this).button('loading');
+			cleanDatabase();
+		});
+	});
+
 	function processRdbToOnto(){
 		if($("#databaseName").val()=="" && ($("#databaseStructure").val()=="" || $("#databaseRecords").val()=="")){
 			$(".alert-danger").show();
-			return;
+			return false;
 		}
 		var form=document.forms[0];
 		form.action="<html:rewrite page='/ProcessRdbToOnto.do' />";
+		form.submit();
+		return true;
+	}
+	
+	function cleanDatabase(){
+		var form=document.forms[0];
+		form.action="<html:rewrite page='/CleanDataBase.do' />";
+		form.submit();
+	}
+	
+	function downloadOwl(){
+		var form=document.forms[0];
+		form.action="<html:rewrite page='/DownloadOWLFile.do' />";
 		form.submit();
 	}
 </script>
@@ -41,12 +72,12 @@
 				<html:file name="rdbToOntoForm" property="databaseStructure" styleClass="form-control" styleId="databaseStructure" />
 			</div>
 			
-			<!--<div class="form-group">
-				<label for="databaseRecords"><bean:message key="label.database.records" />:</label>
-				<input type="file" class="form-control" id="databaseRecords">
-			</div>-->
+			<button id="btnRdbToOnto" type="button" class="btn btn-primary"><bean:message key="button.submit" /></button>
 			
-			<button type="button" onclick="javascript: processRdbToOnto();" class="btn btn-primary"><bean:message key="button.submit" /></button>
+			<hr />
+			
+			<button id="btnCleanDatabase" type="button" onclick="javascript: cleanDatabase();" class="btn btn-primary"><bean:message key="label.clean.db" /></button>
+			<button id="btnDownloadOwl" type="button" onclick="javascript: downloadOwl();" class="btn btn-primary"><bean:message key="label.download.owl" /></button>
 			
 		</form>
 	</div>

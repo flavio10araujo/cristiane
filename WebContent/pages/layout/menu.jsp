@@ -12,35 +12,39 @@ $(document).ready(function(){
 <nav class="navbar navbar-inverse">
 	<div class="container-fluid">
 		<div class="navbar-header">
-			<a class="navbar-brand" href="#" onclick="javascript: goToPage('RdbToOnto');"><bean:message key="label.rdb.to.onto" /></a>
+			<!--<a class="navbar-brand" href="#" onclick="javascript: goToPage('Overview');"><bean:message key="label.overview" /></a>-->
 		</div>
 		<div>
 			<ul class="nav navbar-nav">
 				<li id="overview-page" class="active"><a href="#" onclick="javascript: goToPage('Overview');"><bean:message key="label.overview" /></a></li>
-				<li class="dropdown"><a class="dropdown-toggle"
-					data-toggle="dropdown" href="#"><bean:message key="label.download" /><span class="caret"></span></a>
+				<li id="rdbtoonto-page" class="active"><a href="#" onclick="javascript: goToPage('RdbToOnto');"><bean:message key="label.rdb.to.onto" /></a></li>
+				<li id="projectdoc-page" class="active"><a href="#" onclick="javascript: goToPage('ProjectDoc');"><bean:message key="label.project_documentation" /></a></li>
+				
+				
+				<!--<li class="dropdown">
+					<a class="dropdown-toggle" data-toggle="dropdown" href="#"><bean:message key="label.project_documentation" /><span class="caret"></span></a>
 					<ul class="dropdown-menu">
 						<li><a href="#"><bean:message key="label.project" /></a></li>
 						<li><a href="#"><bean:message key="label.documentation" /></a></li>
 					</ul>
 				</li>
-				<li class="dropdown"><a class="dropdown-toggle"
-					data-toggle="dropdown" href="#"><bean:message key="label.template" /><span class="caret"></span></a>
+				<li class="dropdown">
+					<a class="dropdown-toggle" data-toggle="dropdown" href="#"><bean:message key="label.template" /><span class="caret"></span></a>
 					<ul class="dropdown-menu">
 						<li><a href="#"><bean:message key="label.database.structure" /></a></li>
-						<!--<li><a href="#"><bean:message key="label.database.records" /></a></li>-->
+						<li><a href="#"><bean:message key="label.database.records" /></a></li>
 					</ul>
 				</li>
-				<li class="dropdown"><a class="dropdown-toggle"
-					data-toggle="dropdown" href="#"><bean:message key="label.scripts" /><span class="caret"></span></a>
+				<li id="script-page" class="dropdown">
+					<a class="dropdown-toggle" data-toggle="dropdown" href="#"><bean:message key="label.scripts" /><span class="caret"></span></a>
 					<ul class="dropdown-menu">
 						<li><a href="#"><bean:message key="label.upper.level.ontology" /></a></li>
 						<li><a href="#"><bean:message key="label.project.database" /></a></li>
 						<li><a href="#" onclick="javascript: goToPage('GoCleanDataBase');"><bean:message key="label.clean.db" /></a></li>
-						<li><a href="#" onclick="javascript: goToPage('GoDownloadOWLFile');">Download OWL File</a></li>
+						<li><a href="#" onclick="javascript: goToPage('GoDownloadOWLFile');"><bean:message key="label.download.owl" /></a></li>
 					</ul>
 				</li>
-				<li><a href="#"><bean:message key="label.contact" /></a></li>
+				<li><a href="#"><bean:message key="label.contact" /></a></li>-->
 			</ul>
 		</div>
 	</div>

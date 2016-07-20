@@ -25,6 +25,28 @@ public class ObjectPropertyDomainRange implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "c011_class_id_range")
 	private br.ufpr.bean.Class classRange;
+	
+	public boolean equals(Object o) {
+		if (o == null) {
+			return false;
+		}
+		
+		if(!(o instanceof ObjectPropertyDomainRange)) {
+			return false;
+		}
+		
+		ObjectPropertyDomainRange other = (ObjectPropertyDomainRange) o;
+		
+	    if (this.objectProperty.getId() != other.objectProperty.getId()) {
+	    	return false;
+	    }
+
+	    return true;
+	}
+	
+	public int hashCode() {
+	    return (int) this.objectProperty.getId().hashCode();
+	}
 
 	public br.ufpr.bean.Class getClassDomain() {
 		return classDomain;

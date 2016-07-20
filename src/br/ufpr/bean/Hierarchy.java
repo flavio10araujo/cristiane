@@ -23,6 +23,32 @@ public class Hierarchy implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "c011_sub_class_id")
 	private br.ufpr.bean.Class subClass;
+	
+	public boolean equals(Object o) {
+		if (o == null) {
+			return false;
+		}
+		
+		if(!(o instanceof Hierarchy)) {
+			return false;
+		}
+		
+		Hierarchy other = (Hierarchy) o;
+		
+	    if (this.superClass.getId() != other.superClass.getId()) {
+	    	return false;
+	    }
+	    
+	    if (this.subClass.getId() != other.subClass.getId()) {
+	    	return false;
+	    }
+
+	    return true;
+	}
+	
+	public int hashCode() {
+	    return (int) this.superClass.getId().hashCode() * this.subClass.getId().hashCode();
+	}
 
 	public br.ufpr.bean.Class getSuperClass() {
 		return superClass;

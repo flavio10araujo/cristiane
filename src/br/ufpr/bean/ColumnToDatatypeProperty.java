@@ -23,6 +23,32 @@ public class ColumnToDatatypeProperty implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "c013_datatype_property_id", nullable = false)
 	private DatatypeProperty datatypeProperty;
+	
+	public boolean equals(Object o) {
+		if (o == null) {
+			return false;
+		}
+		
+		if(!(o instanceof ColumnToDatatypeProperty)) {
+			return false;
+		}
+		
+		ColumnToDatatypeProperty other = (ColumnToDatatypeProperty) o;
+		
+	    if (this.column.getId() != other.column.getId()) {
+	    	return false;
+	    }
+	    
+	    if (this.datatypeProperty.getId() != other.datatypeProperty.getId()) {
+	    	return false;
+	    }
+
+	    return true;
+	}
+	
+	public int hashCode() {
+	    return (int) this.column.getId().hashCode() * this.datatypeProperty.getId().hashCode();
+	}
 
 	public Column getColumn() {
 		return column;

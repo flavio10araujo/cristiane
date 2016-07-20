@@ -24,5 +24,9 @@
 	<definition name="tiles.downloadOWLFile" extends="mainLayout">
 		<put name="body" value="/pages/downloadOWLFile.jsp"></put>	
 	</definition>
+	
+	<definition name="tiles.projectDoc" extends="mainLayout">
+		<put name="body" value="/pages/projectDoc.jsp"></put>	
+	</definition>
 
 </tiles-definitions>
