@@ -528,7 +528,7 @@ public class RdbToOntoBO {
 				name = Util.funcaoMaiuscula(table.getPhysicalName()); // PASSO 6.1a
 			}
 
-			name = "e" + name; // PASSO 6.1b
+			name = "E" + name; // PASSO 6.1b
 			c.setName(name);
 			c.setOntology(ontology);
 			classDao.saveOrUpdate(c); // PASSO 6.1
@@ -570,7 +570,7 @@ public class RdbToOntoBO {
 				br.ufpr.bean.Class c = new br.ufpr.bean.Class();
 				c.setCheckSubject(checkSubject);
 				name = Util.funcaoMaiuscula(checkSubject.getDescription());
-				name = "v" + name;
+				name = "V" + name;
 				c.setName(name);
 				c.setOntology(ontology);
 				classDao.saveOrUpdate(c); // PASSO 17.1
@@ -819,7 +819,7 @@ public class RdbToOntoBO {
 			}
 			
 			ObjectProperty objectProperty = new ObjectProperty();			
-			description = "UK" + Util.funcaoMaiuscula(column.getLogicalName());
+			description = "uK" + Util.funcaoMaiuscula(column.getLogicalName());
 			objectProperty.setDescription(description);
 			objectProperty.setOntology(ontology);
 			objectProperty.setMinCardinality(true); // PASSO 18.3
@@ -870,7 +870,7 @@ public class RdbToOntoBO {
 			}
 			
 			ObjectProperty objectProperty = new ObjectProperty();			
-			description = "PK" + Util.funcaoMaiuscula(column.getLogicalName());
+			description = "pK" + Util.funcaoMaiuscula(column.getLogicalName());
 			objectProperty.setDescription(description);
 			objectProperty.setOntology(ontology);
 			objectProperty.setMinCardinality(true); // PASSO 18.3
@@ -887,7 +887,7 @@ public class RdbToOntoBO {
 			
 			// Inserir na T022.
 			ObjectPropertyDomainRange objectPropertyDomainRange = new ObjectPropertyDomainRange();
-			objectPropertyDomainRange.setClassRange(classDao.getByTable(column.getTable())); // objectPropertyDomainRange.setClassDomain(classDao.getByTable(column.getTable()));
+			objectPropertyDomainRange.setClassRange(classDao.getByTable(column.getTable()));
 			objectPropertyDomainRange.setObjectProperty(objectProperty);
 			objectPropertyDomainRangeDao.saveOrUpdate(objectPropertyDomainRange);
 		}
@@ -921,7 +921,7 @@ public class RdbToOntoBO {
 			}
 			
 			ObjectProperty objectProperty = new ObjectProperty();			
-			description = "Tem" + Util.funcaoMaiuscula(column.getLogicalName());
+			description = "tem" + Util.funcaoMaiuscula(column.getLogicalName());
 			objectProperty.setDescription(description);
 			objectProperty.setOntology(ontology);
 			
@@ -967,7 +967,7 @@ public class RdbToOntoBO {
 			}
 			
 			ObjectProperty objectProperty = new ObjectProperty();			
-			description = "KM" + Util.funcaoMaiuscula(column.getLogicalName());
+			description = "kM" + Util.funcaoMaiuscula(column.getLogicalName());
 			objectProperty.setDescription(description);
 			objectProperty.setOntology(ontology);
 			objectProperty.setMinCardinality(true); // PASSO 27.1
@@ -1015,7 +1015,7 @@ public class RdbToOntoBO {
 			}
 			
 			ObjectProperty objectProperty = new ObjectProperty();			
-			description = "KS" + Util.funcaoMaiuscula(column.getTable().getLogicalName()) + "Tem" + Util.funcaoMaiuscula(column.getLogicalName()); // PASSO 30
+			description = "kS" + Util.funcaoMaiuscula(column.getTable().getLogicalName()) + "Tem" + Util.funcaoMaiuscula(column.getLogicalName()); // PASSO 30
 			objectProperty.setDescription(description);
 			objectProperty.setOntology(ontology);
 			

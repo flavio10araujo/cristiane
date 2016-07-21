@@ -106,7 +106,7 @@ ul.c-controls li a:hover {
 </script>
 
 <div class="panel panel-default">
-	<div class="panel-heading">RDB to ONTO Project</div>
+	<div class="panel-heading" >RDB to ONTO Project</div>
 	<div class="panel-body">
 		
 		<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras eleifend nulla a nisl rhoncus varius. Etiam luctus massa nisi, eget congue arcu blandit et. Fusce iaculis, metus in ultricies facilisis, diam enim dapibus massa, consequat sodales augue massa sed felis. Mauris eget sapien commodo, eleifend lacus vitae, cursus turpis. Fusce sed mi id tellus hendrerit gravida. Fusce vitae egestas mauris, id viverra lacus. Quisque consectetur vestibulum urna quis consequat. Vivamus luctus neque odio, gravida mattis erat pretium at. Sed molestie vel risus sit amet accumsan.</p>
@@ -126,8 +126,9 @@ ul.c-controls li a:hover {
 	                            <img src="<%=contextPath%>/pages/img/member01.jpg" class="img-responsive img-circle" />
 	                        </div>
 	                        <div class="col-xs-12 col-sm-9">
-	                            <span class="name">Cristiane Aparecida Huve</span><br />
-		                            <span>Fez pós em banco.</span>
+	                            <span class="name">Cristiane Huve</span><br />
+		                            <span>Fez pós em banco.</span><br/>
+		                            <span>caghuve@inf.ufpr.br</span>
 	                        </div>
 	                        <div class="clearfix"></div>
 	                    </li>
@@ -136,8 +137,9 @@ ul.c-controls li a:hover {
 	                            <img src="<%=contextPath%>/pages/img/member02.jpg" class="img-responsive img-circle" />
 	                        </div>
 	                        <div class="col-xs-12 col-sm-9">
-	                            <span class="name">Flávio Moisés de Araújo</span><br />
-	                            <span>Não fez pós em banco.</span>
+	                            <span class="name">Leticia Mara Peres</span><br />
+	                            <span>Doutora, Universidade Federal do Paraná, Brasil.</span><br/>
+	                            <span>lmperes@inf.ufpr.br</span>
 	                        </div>
 	                        <div class="clearfix"></div>
 	                    </li>
@@ -146,8 +148,9 @@ ul.c-controls li a:hover {
 	                            <img src="<%=contextPath%>/pages/img/member03.jpg" class="img-responsive img-circle" />
 	                        </div>
 	                        <div class="col-xs-12 col-sm-9">
-	                            <span class="name">Jariel Luvizon</span><br />
-	                            <span>Programador Java certificado SCJP.</span>
+	                            <span class="name">Marcos Didonet Del Fabro</span><br />
+	                            <span>Doutor, Université de Nantes, França.</span><br/>
+	                            <span>didonet@inf.ufpr.br</span>
 	                        </div>
 	                        <div class="clearfix"></div>
 	                    </li>
@@ -156,8 +159,9 @@ ul.c-controls li a:hover {
 	                            <img src="<%=contextPath%>/pages/img/member04.jpg" class="img-responsive img-circle" />
 	                        </div>
 	                        <div class="col-xs-12 col-sm-9">
-	                            <span class="name">Bill Gates</span><br/>
-	                            <span>Co-fundador da empresa MicroSoft.</span>
+	                            <span class="name">Hegler Tissot</span><br/>
+	                            <span>Doutor, Universidade Federal do Paraná, Brasil.</span><br/>
+	                            <span>hctissot@inf.ufpr.br</span>
 	                        </div>
 	                        <div class="clearfix"></div>
 	                    </li>

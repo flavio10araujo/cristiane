@@ -4,28 +4,6 @@ import java.text.Normalizer;
 
 public class Util {
 
-	public static void main(String[] Args) {
-		/*System.out.println(funcaoMaiuscula("01_Cadastros básicos do sistema"));
-		System.out.println(funcaoMinuscula("01_Cadastros básicos do sistema"));
-		System.out.println(funcaoMaiuscula("R"));
-		System.out.println(funcaoMaiuscula("nm_usuario"));
-		System.out.println(funcaoMaiuscula("dt_alteração"));*/
-				
-		System.out.println(functionForImportRecords("[1, Procedimentos Cirurgicos]"));
-		System.out.println(functionForImportRecords("[1,  Procedimentos Cirurgicos]"));
-		System.out.println(functionForImportRecords("[1,Procedimentos Cirurgicos]"));
-		System.out.println(functionForImportRecords("[2, Procedimentos de urgencia]"));
-		System.out.println(functionForImportRecords("[331,345,DOCUMENTACAO ORTODONTICA \"A\"]"));
-
-		//System.out.println(functionForInverseObjectProperties("temRestricaoSexo"));
-
-		/*System.out.println(cleanDataType("number"));
-		System.out.println(cleanDataType("varchar2"));
-		System.out.println(cleanDataType("number(15,2)"));
-		System.out.println(cleanDataType("varchar2 (100)"));
-		System.out.println(cleanDataType("CHAR"));*/
-	}
-
 	/**
 	 * Função para remover acentos, espaços em branco, preposições e formar uma única palavra com as primeiras letras em maiúsculo.
 	 * Ex.: Cadastros básicos do sistema -> CadastrosBasicosSistema
@@ -181,7 +159,7 @@ public class Util {
 
 	/**
 	 * Função específica para o método DownloadOWLFileBO.setObjectProperty.
-	 * Deve apterar uma String conforme o exemplo:
+	 * Deve alterar uma String conforme o exemplo:
 	 * De: temRestricaoSexo
 	 * Para: eRestricaoSexoDe
 	 * 
