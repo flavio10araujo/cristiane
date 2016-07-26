@@ -967,7 +967,8 @@ public class RdbToOntoBO {
 			}
 			
 			ObjectProperty objectProperty = new ObjectProperty();			
-			description = "kM" + Util.funcaoMaiuscula(column.getLogicalName());
+			//description = "kM" + Util.funcaoMaiuscula(column.getLogicalName());
+			description = "kM" + Util.funcaoMaiuscula(column.getTable().getLogicalName()) + "Tem" + Util.funcaoMaiuscula(column.getLogicalName()); // PASSO 27
 			objectProperty.setDescription(description);
 			objectProperty.setOntology(ontology);
 			objectProperty.setMinCardinality(true); // PASSO 27.1
@@ -1087,8 +1088,7 @@ public class RdbToOntoBO {
 	
 	public void importRecordsToClasses(RdbToOntoForm form, Database database, Ontology ontology) throws FileNotFoundException, IOException {
 		// PASSO 34
-		// Verificar quais registros da T004 são relacionados a tabelas que possuem alguma coluna com C003_PRIMARY_KEY = 1 AND C003_FOREIGN_KEY = 1.
-		
+		//Verificar quais registros da T004 são relacionados a tabelas que possuem uma coluna com C003_PRIMARY_KEY = 1 AND C003_FOREIGN_KEY = 0.
 		@SuppressWarnings("unchecked")
 		List<Record> records = (ArrayList<Record>) recordDao.findAll(Record.class);
 		
@@ -1102,13 +1102,13 @@ public class RdbToOntoBO {
 			table = record.getTable();
 			
 			if ("C".equals(table.getDescription())) {
-				// Verificar se a tabela possui alguma coluna C003_PRIMARY_KEY = 1 AND C003_FOREIGN_KEY = 1.
+				// Verificar se a tabela possui alguma coluna C003_PRIMARY_KEY = 1 AND C003_FOREIGN_KEY = 0.
 				
-				column = columnDao.getByTableAndPrimaryKeyAndForeignKey(table.getId(), true, true);
+				column = columnDao.getByTableAndPrimaryKeyAndForeignKey(table.getId(), true, false);
 				
-				// Se for null, significa que a tabela não possui nenhuma coluna com C003_PRIMARY_KEY = 1 AND C003_FOREIGN_KEY = 1.
+				// Se for null, significa que a tabela não possui nenhuma coluna com C003_PRIMARY_KEY = 1 AND C003_FOREIGN_KEY = 0.
 				// Portanto, deve ser importada no PASSO 35.
-				if (column == null) {
+				if (column != null) {
 					// Inserir na T011.
 					br.ufpr.bean.Class c = new br.ufpr.bean.Class();
 					String name = "h" + Util.functionForImportRecords(record.getColumnvalues()); // PASSO 35
