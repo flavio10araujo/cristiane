@@ -284,25 +284,6 @@ public class RdbToOntoBO {
 			String[] fields = line.split(";", -1);
 
 			// Inserir as colunas.
-			// Se tem indAssociativeKey = 1 e IndColumnCheck = 0. // PASSO 14
-			if ("C".equals(fields[0]) 
-					/*&& "1".equals(fields[old14])*/ 
-					&& "0".equals(fields[13])//&& "0".equals(fields[old19])
-				) {
-				System.out.println(line);
-				importColumn(database, fields);
-			}
-		}
-
-		scanner.close();
-
-		scanner = new Scanner(form.getDatabaseStructure().getInputStream(), "UTF-8");
-
-		while (scanner.hasNextLine()) {
-			String line = scanner.nextLine();
-			String[] fields = line.split(";", -1);
-
-			// Inserir as colunas.
 			// Se tem IndColumnCheck = 1. // PASSO 16
 			if ("C".equals(fields[0]) 
 					&& "1".equals(fields[13])//&& "1".equals(fields[old19])
