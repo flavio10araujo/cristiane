@@ -219,21 +219,21 @@ public class RdbToOntoBO {
 				table.setDatabase(database);
 				table.setPhysicalName(fields[1]);
 				table.setLogicalName(fields[2]);
-				table.setDescription(fields[4]);
-				table.setAssociative("1".equals(fields[6]) ? true : false);
+				table.setDescription(fields[3]);//table.setDescription(fields[old4]);
+				table.setAssociative("1".equals(fields[5]) ? true : false);//table.setAssociative("1".equals(fields[old6]) ? true : false);
 
 				// Cadastrando na T002.
 				tableDao.saveOrUpdate(table); // PASSO 5
 				
 				// Apenas para tabelas não-associativas.
-				if (fields[6].equals("0")) {
-					DatabaseDomain databaseDomain = databaseDomainDao.getByDescription(database, fields[5]);
+				if (fields[5].equals("0")) {//if (fields[old6].equals("0")) {
+					DatabaseDomain databaseDomain = databaseDomainDao.getByDescription(database, fields[4]);//DatabaseDomain databaseDomain = databaseDomainDao.getByDescription(database, fields[old5]);
 	
 					// Se não encontrou o databaseDomain (T008) no banco, deve cadastrá-lo.
 					if (databaseDomain == null) {
 						databaseDomain = new DatabaseDomain();
 						databaseDomain.setDatabase(database);
-						databaseDomain.setDescription(fields[5].toLowerCase());
+						databaseDomain.setDescription(fields[4].toLowerCase());//databaseDomain.setDescription(fields[old5].toLowerCase());
 						databaseDomainDao.saveOrUpdate(databaseDomain);
 					}
 	
@@ -266,7 +266,10 @@ public class RdbToOntoBO {
 
 			// Inserir as colunas.
 			// Se tem indAssociativeKey = 0 e IndColumnCheck = 0. // PASSO 9
-			if ("C".equals(fields[0]) && "0".equals(fields[14]) && "0".equals(fields[19])) {
+			if ("C".equals(fields[0]) 
+					/*&& "0".equals(fields[old14])*/ 
+					&& "0".equals(fields[13])//&& "0".equals(fields[old19])
+				) {
 				System.out.println(line);
 				importColumn(database, fields);
 			}
@@ -282,7 +285,10 @@ public class RdbToOntoBO {
 
 			// Inserir as colunas.
 			// Se tem indAssociativeKey = 1 e IndColumnCheck = 0. // PASSO 14
-			if ("C".equals(fields[0]) && "1".equals(fields[14]) && "0".equals(fields[19])) {
+			if ("C".equals(fields[0]) 
+					/*&& "1".equals(fields[old14])*/ 
+					&& "0".equals(fields[13])//&& "0".equals(fields[old19])
+				) {
 				System.out.println(line);
 				importColumn(database, fields);
 			}
@@ -298,7 +304,9 @@ public class RdbToOntoBO {
 
 			// Inserir as colunas.
 			// Se tem IndColumnCheck = 1. // PASSO 16
-			if ("C".equals(fields[0]) && "1".equals(fields[19])) {
+			if ("C".equals(fields[0]) 
+					&& "1".equals(fields[13])//&& "1".equals(fields[old19])
+				) {
 				System.out.println(line);
 				importColumn(database, fields);
 			}
@@ -323,9 +331,9 @@ public class RdbToOntoBO {
 			column.setLogicalName(Util.funcaoMaiuscula(column.getPhysicalName()));			
 		}
 
-		column.setLogicalName2(fields[3]);
+		//column.setLogicalName2(fields[old3]);
 
-		Table table = tableDao.getByPhysicalName(database.getId(), fields[7]); // PASSO 10
+		Table table = tableDao.getByPhysicalName(database.getId(), fields[6]); // PASSO 10//Table table = tableDao.getByPhysicalName(database.getId(), fields[old7]); // PASSO 10
 
 		// table será null quando o sistema não encontrar a tabela com a qual a coluna importada é relacionada.
 		// Isso pode ocorrer quando a tabela for associativa, pois no momento essas tabelas não estão sendo importadas.
@@ -336,8 +344,8 @@ public class RdbToOntoBO {
 		column.setTable(table);
 
 		// Se informou o datatype.
-		if (!"".equals(fields[8])) {
-			DatatypeDb datatypeDb = datatypeDbDao.getByDescription(fields[8]); // PASSO 11
+		if (!"".equals(fields[7])) {//if (!"".equals(fields[old8])) {
+			DatatypeDb datatypeDb = datatypeDbDao.getByDescription(fields[7]); // PASSO 11//DatatypeDb datatypeDb = datatypeDbDao.getByDescription(fields[old8]); // PASSO 11
 
 			// Se encontrou o datatype no banco.
 			if (datatypeDb != null) {
@@ -346,7 +354,7 @@ public class RdbToOntoBO {
 			else {
 				// Deve cadastrar o datatype (T005).
 				datatypeDb = new DatatypeDb();
-				datatypeDb.setDescription(fields[8].toLowerCase());
+				datatypeDb.setDescription(fields[7].toLowerCase());//datatypeDb.setDescription(fields[old8].toLowerCase());
 				datatypeDbDao.saveOrUpdate(datatypeDb); // PASSO 11
 				column.setDatatypeDb(datatypeDb);
 
@@ -358,51 +366,51 @@ public class RdbToOntoBO {
 			}
 		}
 
-		column.setPrimaryKey("1".equals(fields[9]) ? true : false);
-		column.setUniqueKey("1".equals(fields[10]) ? true : false); // PASSO 12.1
-		column.setForeignKey("1".equals(fields[11]) ? true : false);
+		column.setPrimaryKey("1".equals(fields[8]) ? true : false);//column.setPrimaryKey("1".equals(fields[old9]) ? true : false);
+		column.setUniqueKey("1".equals(fields[9]) ? true : false); // PASSO 12.1//column.setUniqueKey("1".equals(fields[old10]) ? true : false); // PASSO 12.1
+		column.setForeignKey("1".equals(fields[10]) ? true : false);//column.setForeignKey("1".equals(fields[old11]) ? true : false);
 
-		Table fkTable = tableDao.getByPhysicalName(database.getId(), fields[12]);
+		Table fkTable = tableDao.getByPhysicalName(database.getId(), fields[11]);//Table fkTable = tableDao.getByPhysicalName(database.getId(), fields[old12]);
 		column.setFkTable(fkTable); // PASSO 13
 
-		column.setIndDescription("1".equals(fields[13]) ? true : false);
-		column.setIndAssociativeKey("1".equals(fields[14]) ? true : false);
+		column.setIndDescription("1".equals(fields[12]) ? true : false);//column.setIndDescription("1".equals(fields[old13]) ? true : false);
+		//column.setIndAssociativeKey("1".equals(fields[old14]) ? true : false);
 
-		Table akTableId1 = tableDao.getByPhysicalName(database.getId(), fields[15]);
+		/*Table akTableId1 = tableDao.getByPhysicalName(database.getId(), fields[old15]);
 		column.setAkTableId1(akTableId1); // PASSO 15
 
 		if (akTableId1 != null) {
-			Column akColumnId1 = columnDao.getByPhysicalName(akTableId1.getId(), fields[16]);
+			Column akColumnId1 = columnDao.getByPhysicalName(akTableId1.getId(), fields[old16]);
 			column.setAkColumnId1(akColumnId1);
-		}
+		}*/
 
-		Table akTableIdN = tableDao.getByPhysicalName(database.getId(), fields[17]);
+		/*Table akTableIdN = tableDao.getByPhysicalName(database.getId(), fields[old17]);
 		column.setAkTableIdN(akTableIdN);
 
 		if (akTableIdN != null) {
-			Column akColumnN = columnDao.getByPhysicalName(akTableIdN.getId(), fields[18]);
+			Column akColumnN = columnDao.getByPhysicalName(akTableIdN.getId(), fields[old18]);
 			column.setAkColumnN(akColumnN);
-		}
+		}*/
 
-		column.setIndColumnCheck("1".equals(fields[19]) ? true : false);
+		column.setIndColumnCheck("1".equals(fields[13]) ? true : false);//column.setIndColumnCheck("1".equals(fields[old19]) ? true : false);
 
 		// Salvando a coluna (T003).
 		columnDao.saveOrUpdate(column); // PASSO 12
 
 		// Se informou o checkSubject. // PASSO 17
-		if (!"".equals(fields[22])) {
-			CheckSubject checkSubject = checkSubjectDao.getByDescription(fields[22]);
+		if (!"".equals(fields[16])) {//if (!"".equals(fields[old22])) {
+			CheckSubject checkSubject = checkSubjectDao.getByDescription(fields[16]);//CheckSubject checkSubject = checkSubjectDao.getByDescription(fields[old22]);
 
 			// Se não encontrou o checkSubject no banco, deve cadastrá-lo. 
 			if (checkSubject == null) {
 				checkSubject = new CheckSubject();
-				checkSubject.setDescription(fields[22].toLowerCase());
+				checkSubject.setDescription(fields[16].toLowerCase());//checkSubject.setDescription(fields[old22].toLowerCase());
 				// Inserindo na T007.
 				checkSubjectDao.saveOrUpdate(checkSubject); // PASSO 17
 			}
 
-			String[] checkValues = fields[20].split(",", -1);
-			String[] checkAbreviations = fields[21].split(",", -1);
+			String[] checkValues = fields[14].split(",", -1);//String[] checkValues = fields[old20].split(",", -1);
+			String[] checkAbreviations = fields[15].split(",", -1);//String[] checkAbreviations = fields[old21].split(",", -1);
 
 			for (int j = 0; j < checkValues.length; j++) {
 
@@ -1061,10 +1069,10 @@ public class RdbToOntoBO {
 
 				Record record = new Record();
 				
-				record.setTableColumns(fields[23]);
-				record.setColumnvalues(fields[24]);
+				record.setTableColumns(fields[17]);//record.setTableColumns(fields[old23]);
+				record.setColumnvalues(fields[18]);//record.setColumnvalues(fields[old24]);
 				
-				Table table = tableDao.getByPhysicalName(database.getId(), fields[7]);
+				Table table = tableDao.getByPhysicalName(database.getId(), fields[6]);//Table table = tableDao.getByPhysicalName(database.getId(), fields[old7]);
 				record.setTable(table);
 
 				// Inserir na T004.

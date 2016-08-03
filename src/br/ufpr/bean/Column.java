@@ -26,7 +26,7 @@ public class Column implements Serializable {
 	@javax.persistence.Column(name = "c003_logical_name", nullable = false)
 	private String logicalName;
 	
-	@javax.persistence.Column(name = "c003_logical_name_2", nullable = false)
+	@javax.persistence.Column(name = "c003_logical_name_2")
 	private String logicalName2;
 
 	@ManyToOne
